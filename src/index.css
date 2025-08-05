@@ -1,3 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary-main: #0FEF9E;
+  --color-primary-secondary: #28AFFF;
+  
+  /* Typography */
+  --font-primary: 'Manrope', sans-serif;
+  --font-secondary: 'Noto Sans', 'Noto Sans SC', 'Noto Sans Thai', sans-serif;
+
+  /* text color */
+  --color-sub-title: #D1D1D1;
+}
+
+body {
+  background-color: #090909;
+  color: #fff;
+  font-family: var(--font-primary);
+}
