@@ -32,6 +32,40 @@ export const BgTopLeftSvg = ({ color = "var(--color-primary-main)" }) => {
   );
 };
 
+export const BgTopLeftMobileSvg = ({ color = "var(--color-primary-main)" }) => {
+  return (
+    <svg
+      width="116"
+      height="139"
+      viewBox="0 0 116 139"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="26.6081"
+        cy="50.3483"
+        r="88.6346"
+        transform="rotate(-45 26.6081 50.3483)"
+        fill="url(#paint0_linear_151_3778)"
+        fillOpacity="0.2"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_151_3778"
+          x1="26.6081"
+          y1="-38.2863"
+          x2="26.6081"
+          y2="138.983"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor={color} />
+          <stop offset="1" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+};
+
 export const BgRightCenterSvg = ({ color = "var(--color-primary-secondary)" }) => {
   return (
     <svg
@@ -56,6 +90,40 @@ export const BgRightCenterSvg = ({ color = "var(--color-primary-secondary)" }) =
           y1="0"
           x2="302"
           y2="250"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor={color} />
+          <stop offset="1" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+};
+
+export const BgRightCenterMobileSvg = ({ color = "var(--color-primary-secondary)" }) => {
+  return (
+    <svg
+      width="147"
+      height="226"
+      viewBox="0 0 147 226"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="112.968"
+        width="159.761"
+        height="159.761"
+        transform="rotate(45 112.968 0)"
+        fill="url(#paint0_linear_151_3779)"
+        fillOpacity="0.2"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_151_3779"
+          x1="192.848"
+          y1="0"
+          x2="192.848"
+          y2="159.761"
           gradientUnits="userSpaceOnUse"
         >
           <stop stopColor={color} />
@@ -91,6 +159,37 @@ export const BgBottomCenterSvg = ({ color = "var(--color-primary-main)" }) => {
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
           <feGaussianBlur stdDeviation="300" result="effect1_foregroundBlur_3_404" />
+        </filter>
+      </defs>
+    </svg>
+  );
+};
+
+export const BgBottomCenterMobileSvg = ({ color = "var(--color-primary-main)" }) => {
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 390 610"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g filter="url(#filter0_f_151_3757)">
+        <circle cx="195" cy="530" r="180" fill={color} fillOpacity="0.4" />
+      </g>
+      <defs>
+        <filter
+          id="filter0_f_151_3757"
+          x="-335"
+          y="0"
+          width="1060"
+          height="1060"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="175" result="effect1_foregroundBlur_151_3757" />
         </filter>
       </defs>
     </svg>

@@ -1,11 +1,18 @@
-import { BgBottomCenterSvg, BgRightCenterSvg, BgTopLeftSvg } from '../../icons'
-import Galaxy from '../animations/Galaxy/Galaxy'
+import {
+  BgBottomCenterMobileSvg,
+  BgBottomCenterSvg,
+  BgRightCenterMobileSvg,
+  BgRightCenterSvg,
+  BgTopLeftMobileSvg,
+  BgTopLeftSvg,
+} from "../../icons";
+import Galaxy from "../animations/Galaxy/Galaxy";
 
 const BackgroundWithSvg = () => {
   return (
     <>
-    {/* Galaxy as background */}
-    <div className="absolute top-0 left-0 w-full h-full z-10">
+      {/* Galaxy as background */}
+      <div className="absolute top-0 left-0 w-full h-full z-0">
         <Galaxy
           mouseRepulsion={false}
           mouseInteraction={false}
@@ -24,21 +31,30 @@ const BackgroundWithSvg = () => {
       </div>
 
       {/* BgTopLeftSvg - fixed at top-left */}
-      <div className="fixed top-0 left-0 z-20 pointer-events-none">
+      <div className="fixed hidden md:block top-0 left-0 z-20 pointer-events-none">
         <BgTopLeftSvg />
+      </div>
+      <div className="fixed block md:hidden top-0 left-0 z-20 pointer-events-none">
+        <BgTopLeftMobileSvg />
       </div>
 
       {/* BgRightCenterSvg - right side center */}
-      <div className="fixed top-1/2 right-0 -translate-y-1/2 z-20 pointer-events-none">
+      <div className="fixed hidden md:block top-1/2 right-0 -translate-y-1/2 z-20 pointer-events-none">
         <BgRightCenterSvg />
+      </div>
+      <div className="fixed block md:hidden top-1/2 right-0 -translate-y-1/2 z-20 pointer-events-none">
+        <BgRightCenterMobileSvg />
       </div>
 
       {/* BgBottomCenterSvg - bottom center */}
-      <div className="fixed bottom-0 left-0 w-full z-20 pointer-events-none">
+      <div className="fixed hidden md:block bottom-0 left-0 w-full z-20 pointer-events-none">
         <BgBottomCenterSvg />
       </div>
+      <div className="fixed block md:hidden bottom-0 left-0 w-full z-20 pointer-events-none">
+        <BgBottomCenterMobileSvg />
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default BackgroundWithSvg
+export default BackgroundWithSvg;

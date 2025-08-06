@@ -1,29 +1,20 @@
-import BackgroundWithSvg from "../../components/Background/BackgroundWithSvg";
+import MagicBento from "../../components/animations/MagicBento/MagicBento";
 import { HomeDividerSvg } from "../../icons";
 
 const HomePage = () => {
   return (
-    <div className="w-full h-screen relative overflow-hidden font-primary">
-      <BackgroundWithSvg />
-
+    <div className="w-full relative font-primary">
       {/* Main Content */}
-      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-4">
-        {/* Header - iUX Logo */}
-        <div className="absolute top-[3.125rem] left-1/2 -translate-x-1/2">
-          <img src="/IUX-logo-Primary.svg" alt="logo" />
-        </div>
+      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-4 pt-[3.125rem]">
 
-        {/* Main Content Area */}
-        <div className="text-center max-w-[62rem] gap-[3.75rem] mx-auto">
+        <div className="text-center mt-[7rem] sm:mt-[7.375rem] lg:mt-[9.375rem] max-w-[62rem] gap-[3.75rem] mx-auto">
           {/* Headline */}
-          <h1 className="text-[4rem] font-extrabold mb-[3.75rem] leading-tight">
-            The Network of Wisdom:
-            <br />
-            Connecting Financial Insights
+          <h1 className="text-[2.5rem] md:text-[3.75rem] lg:text-[4rem] max-w-[44rem] lg:max-w-[60rem] mx-auto font-extrabold mb-10 lg:mb-[3.75rem] leading-tight">
+            The Network of Wisdom: Connecting Financial Insights
           </h1>
 
           {/* Feature Links */}
-          <div className="flex items-center justify-center gap-4 mb-[3.75rem] text-primary-main text-2xl font-medium">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-1.5 lg:gap-4 mb-10 lg:mb-[3.75rem] text-primary-main text-xl lg:text-2xl font-medium">
             <span>Uncover the Patterns</span>
             <HomeDividerSvg />
             <span>Build Our Collective Intelligence</span>
@@ -32,10 +23,25 @@ const HomePage = () => {
           </div>
 
           {/* Description */}
-          <p className="text-2xl mb-[3.75rem] text-center mx-auto leading-normal text-subTitle">Lorem ipsum dolor sit amet consectetur. Eleifend viverra etiam donec in. Neque velit tellus aenean iaculis diam vel ac ultrices urna. Pretium pellentesque nascetur eget fringilla nunc elit sit est placerat.</p>
+          <p className="text-base md:text-xl lg:text-2xl mb-10 lg:mb-[3.75rem] text-center mx-auto max-w-[22rem] xs:max-w-full leading-normal text-subTitle">
+            Lorem ipsum dolor sit amet consectetur. Eleifend viverra etiam donec in. Neque velit
+            tellus aenean iaculis diam vel ac ultrices urna. Pretium pellentesque nascetur eget
+            fringilla nunc elit sit est placerat.
+          </p>
 
           {/* CTA Button */}
-          <button className="bg-primary-main text-black font-semibold px-6 py-3 rounded-lg text-base">Connect your insight & Explore the network</button>
+          <MagicBento
+            textAutoHide={true}
+            enableStars={true}
+            enableSpotlight={true}
+            enableBorderGlow={true}
+            enableTilt={true}
+            enableMagnetism={true}
+            clickEffect={true}
+            spotlightRadius={300}
+            particleCount={12}
+            glowColor="15, 239, 158"
+          />
         </div>
       </div>
     </div>
