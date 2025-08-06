@@ -21,6 +21,7 @@ export default {
           secondary: '#28AFFF',
         },
         subTitle: '#D1D1D1',
+        inputBg: '#171717',
       },
       fontFamily: {
         'primary': ['Manrope', 'sans-serif'],

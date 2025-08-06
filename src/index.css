@@ -16,6 +16,9 @@
 
   /* text color */
   --color-sub-title: #D1D1D1;
+
+  /* input color */
+  --color-input-bg: #171717;
 }
 
 body {

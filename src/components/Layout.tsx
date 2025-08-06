@@ -14,7 +14,7 @@ const Layout = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1">
+      <div className="flex-1 pt-[7rem]">
         <Outlet />
       </div>
 

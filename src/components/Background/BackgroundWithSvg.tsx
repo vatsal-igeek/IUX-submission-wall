@@ -1,3 +1,5 @@
+import { useLocation } from "react-router-dom";
+
 import {
   BgBottomCenterMobileSvg,
   BgBottomCenterSvg,
@@ -9,6 +11,9 @@ import {
 import Galaxy from "../animations/Galaxy/Galaxy";
 
 const BackgroundWithSvg = () => {
+  const location = useLocation();
+  const isRegisterPage = location.pathname === "/register";
+
   return (
     <>
       {/* Galaxy as background */}
@@ -47,10 +52,18 @@ const BackgroundWithSvg = () => {
       </div>
 
       {/* BgBottomCenterSvg - bottom center */}
-      <div className="fixed hidden md:block bottom-0 left-0 w-full z-20 pointer-events-none">
+      <div
+        className={`fixed hidden md:block left-0 w-full z-20 pointer-events-none ${
+          isRegisterPage ? "-bottom-[9rem]" : "bottom-0"
+        }`}
+      >
         <BgBottomCenterSvg />
       </div>
-      <div className="fixed block md:hidden bottom-0 left-0 w-full z-20 pointer-events-none">
+      <div
+        className={`fixed block md:hidden bottom-0 left-0 w-full z-20 pointer-events-none ${
+          isRegisterPage ? "-bottom-[9rem]" : "bottom-0"
+        }`}
+      >
         <BgBottomCenterMobileSvg />
       </div>
     </>

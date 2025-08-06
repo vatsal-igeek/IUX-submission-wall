@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router-dom";
 
-import { router } from "./routes";
+import { router } from "./routes/Routes";
 import SplashCursor from "./components/animations/SplashCursor/SplashCursor";
 
 function App() {

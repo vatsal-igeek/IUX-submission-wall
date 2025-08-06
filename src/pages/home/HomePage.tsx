@@ -1,13 +1,15 @@
+import { useNavigate } from "react-router-dom";
+
 import MagicBento from "../../components/animations/MagicBento/MagicBento";
 import { HomeDividerSvg } from "../../icons";
 
 const HomePage = () => {
-  return (
-    <div className="w-full relative font-primary">
-      {/* Main Content */}
-      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-4 pt-[3.125rem]">
+  const navigate = useNavigate();
 
-        <div className="text-center mt-[7rem] sm:mt-[7.375rem] lg:mt-[9.375rem] max-w-[62rem] gap-[3.75rem] mx-auto">
+  return (
+      <div className="relative z-30 w-full h-full flex flex-col items-center justify-center px-4">
+
+        <div className="text-center mt-[3.125rem] lg:mt-[7rem] max-w-[62rem] gap-[3.75rem] mx-auto">
           {/* Headline */}
           <h1 className="text-[2.5rem] md:text-[3.75rem] lg:text-[4rem] max-w-[44rem] lg:max-w-[60rem] mx-auto font-extrabold mb-10 lg:mb-[3.75rem] leading-tight">
             The Network of Wisdom: Connecting Financial Insights
@@ -30,6 +32,7 @@ const HomePage = () => {
           </p>
 
           {/* CTA Button */}
+          <div onClick={() => navigate("/register")}>
           <MagicBento
             textAutoHide={true}
             enableStars={true}
@@ -42,9 +45,9 @@ const HomePage = () => {
             particleCount={12}
             glowColor="15, 239, 158"
           />
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 
