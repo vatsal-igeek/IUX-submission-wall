@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+SC:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,15 +7,15 @@
 
 :root {
   /* Primary Colors */
-  --color-primary-main: #0FEF9E;
-  --color-primary-secondary: #28AFFF;
-  
+  --color-primary-main: #0fef9e;
+  --color-primary-secondary: #28afff;
+
   /* Typography */
-  --font-primary: 'Manrope', sans-serif;
-  --font-secondary: 'Noto Sans', 'Noto Sans SC', 'Noto Sans Thai', sans-serif;
+  --font-primary: "Manrope", sans-serif;
+  --font-secondary: "Noto Sans", "Noto Sans SC", "Noto Sans Thai", sans-serif;
 
   /* text color */
-  --color-sub-title: #D1D1D1;
+  --color-sub-title: #d1d1d1;
 
   /* input color */
   --color-input-bg: #171717;
@@ -25,4 +25,143 @@ body {
   background-color: #090909;
   color: #fff;
   font-family: var(--font-primary);
+}
+
+/* Dark Datepicker Styles */
+.react-datepicker__triangle {
+  display: none;
+}
+
+/* Make datepicker full width of input */
+.react-datepicker-popper {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.react-datepicker {
+  background: var(--color-input-bg) !important;
+  border-radius: 0.5rem !important;
+  border: none !important;
+  font-family: "Manrope", "sans-serif";
+  box-shadow: 0 0.25rem 2rem 0 rgba(0, 0, 0, 0.25);
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+@media (max-width: 475px) {
+  .react-datepicker {
+    padding: 0 !important;
+  }
+}
+
+.react-datepicker__header {
+  background: var(--color-input-bg) !important;
+  border-bottom: none !important;
+  border-radius: 1rem 1rem 0 0 !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.react-datepicker__current-month {
+  padding-bottom: 1rem !important;
+  text-align: center !important;
+  padding-inline: 0.875rem !important;
+}
+
+.react-datepicker__day,
+.react-datepicker__day-name {
+  color: #fff !important;
+  font-weight: 400;
+  font-size: 1rem;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: var(--color-primary-main) !important;
+  color: #000 !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day--today .react-datepicker__day--selected {
+  color: #000 !important;
+  font-weight: 700;
+}
+
+.react-datepicker__day--outside-month {
+  color: #5D5D5D !important;
+}
+
+.react-datepicker__navigation {
+  top: 18px;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #fff !important;
+}
+
+.react-datepicker__month {
+  margin: 0.4rem 1rem;
+}
+
+.react-datepicker__day:hover {
+  background: #0fef9e33 !important;
+  color: var(--color-primary-main) !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day-name {
+  color: var(--color-primary-main) !important;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.react-datepicker__month-container {
+  width: 100% !important;
+}
+
+.react-datepicker__week {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+}
+
+.react-datepicker__day-names {
+  display: flex !important;
+  justify-content: space-between !important;
+  padding-inline: 3% !important;
+}
+
+.react-datepicker__navigation--next {
+  right: 1.25rem !important;
+  top: 1.25rem !important;
+}
+
+.react-datepicker__navigation--previous {
+  position: absolute !important;
+  left: 1.25rem !important;
+  top: 1.25rem !important;
+}
+
+/* Custom thin grey scrollbar for country dropdown */
+.country-scrollbar, .max-h-60.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #171717;
+}
+.country-scrollbar::-webkit-scrollbar, .max-h-60.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+  background: #171717;
+}
+.country-scrollbar::-webkit-scrollbar-thumb, .max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
 }

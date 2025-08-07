@@ -3,11 +3,12 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "../components/Layout";
 import HomePage from "../pages/home/HomePage";
 import RegisterPage from "../pages/register/RegisterPage";
+import { routesObject } from "./routesConfig";
 
 // Create a router
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: routesObject.home.path,
     element: <Layout />,
     children: [
       {
@@ -15,10 +16,9 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/register",
+        path: routesObject.register.path,
         element: <RegisterPage />,
       }
     ]
   },
-  
 ]);
