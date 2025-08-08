@@ -43,6 +43,7 @@ const HomePage = () => {
             spotlightRadius={300}
             particleCount={12}
             glowColor="15, 239, 158"
+            buttonText = "Connect your insight & Explore the network"
           />
         </div>
       </div>

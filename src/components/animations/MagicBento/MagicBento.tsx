@@ -22,19 +22,15 @@ export interface BentoProps {
   glowColor?: string;
   clickEffect?: boolean;
   enableMagnetism?: boolean;
+  buttonText?: string;
+  width?: string;
+  buttonType?: "submit" | "button";
 }
 
 const DEFAULT_PARTICLE_COUNT = 12;
 const DEFAULT_SPOTLIGHT_RADIUS = 300;
 const DEFAULT_GLOW_COLOR = "15, 239, 158";
 const MOBILE_BREAKPOINT = 768;
-
-const cardData: BentoCardProps[] = [
-  {
-    color: "rgba(15, 239, 158, 0.2)",
-    label: "Connect your insight & Explore the network",
-  },
-];
 
 const createParticleElement = (
   x: number,
@@ -522,10 +518,24 @@ const MagicBento: React.FC<BentoProps> = ({
   glowColor = DEFAULT_GLOW_COLOR,
   clickEffect = true,
   enableMagnetism = true,
+  buttonText = "Button Text",
+  width = "auto",
+  buttonType = "button",
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const isMobile = useMobileDetection();
   const shouldDisableAnimations = disableAnimations || isMobile;
+
+  // Update cardData with the buttonText prop
+  const updatedCardData: BentoCardProps[] = [
+    {
+      color: "rgba(15, 239, 158, 0.2)",
+      label: buttonText,
+    },
+  ];
+
+  // Determine the card width based on the width prop
+  const cardWidth = width === "100%" ? "w-full" : "w-auto";
 
   return (
     <>
@@ -548,6 +558,7 @@ const MagicBento: React.FC<BentoProps> = ({
           .card-responsive {
             margin: 0 auto;
             padding: 0.5rem;
+            ${width === "100%" ? "width: 100%;" : ""}
           }
           
                      .card--border-glow::after {
@@ -639,11 +650,11 @@ const MagicBento: React.FC<BentoProps> = ({
       )}
 
       <BentoCardGrid gridRef={gridRef}>
-        <div className="card-responsive grid gap-2">
-          {cardData.map((card, index) => {
-                         const baseClassName = `card tracking-wide flex flex-col justify-between relative w-full max-w-full px-4 xs:px-6 py-3 rounded-[8px] border-none font-light overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] hover:cursor-pointer ${
-               enableBorderGlow ? "card--border-glow" : ""
-             }`;
+        <div className={`card-responsive grid gap-2 ${cardWidth}`}>
+          {updatedCardData.map((card, index) => {
+            const baseClassName = `card tracking-wide flex flex-col justify-between relative ${cardWidth} max-w-full px-4 xs:px-6 py-3 rounded-[8px] border-none font-light overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] hover:cursor-pointer ${
+              enableBorderGlow ? "card--border-glow" : ""
+            }`;
 
             const cardStyle = {
               backgroundColor: card.color || "var(--background-dark)",
@@ -653,6 +664,7 @@ const MagicBento: React.FC<BentoProps> = ({
               "--glow-y": "50%",
               "--glow-intensity": "0",
               "--glow-radius": "200px",
+              width: width === "100%" ? "100%" : "auto",
             } as React.CSSProperties;
 
             if (enableStars) {
@@ -668,16 +680,20 @@ const MagicBento: React.FC<BentoProps> = ({
                   clickEffect={clickEffect}
                   enableMagnetism={enableMagnetism}
                 >
-                  <div className="card__header justify-between gap-3 contents sm:flex relative text-white">
+                  <button
+                    type={buttonType}
+                    className="card__header justify-center gap-3 contents sm:flex relative text-white text-center w-full h-full bg-transparent border-none cursor-pointer"
+                  >
                     <span className="card__label text-[14px] xs:text-base">{card.label}</span>
-                  </div>
+                  </button>
                 </ParticleCard>
               );
             }
 
             return (
-              <div
+              <button
                 key={index}
+                type={buttonType}
                 className={baseClassName}
                 style={cardStyle}
                 ref={(el) => {
@@ -790,10 +806,10 @@ const MagicBento: React.FC<BentoProps> = ({
                   el.addEventListener("click", handleClick);
                 }}
               >
-                <div className="card__header flex justify-between gap-3 relative text-white">
+                <div className="card__header flex justify-center gap-3 relative text-white text-center">
                   <span className="card__label text-base">{card.label}</span>
                 </div>
-                <div className="card__content flex flex-col relative text-white">
+                <div className="card__content flex flex-col relative text-white text-center">
                   <h3
                     className={`card__title font-normal text-base m-0 mb-1 ${
                       textAutoHide ? "text-clamp-1" : ""
@@ -809,7 +825,7 @@ const MagicBento: React.FC<BentoProps> = ({
                     {card.description}
                   </p>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

@@ -2,7 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Layout from "../components/Layout";
 import HomePage from "../pages/home/HomePage";
-import RegisterPage from "../pages/register/RegisterPage";
+import WishingWallPage from "../pages/wishing-wall/WishingWallPage";
+import ProtectedRoute from "./ProtectedRoute";
+import { RegisterProtectedRoute } from "./RegisterProtectedRoute";
 import { routesObject } from "./routesConfig";
 
 // Create a router
@@ -17,8 +19,17 @@ export const router = createBrowserRouter([
       },
       {
         path: routesObject.register.path,
-        element: <RegisterPage />,
-      }
-    ]
+        element: <RegisterProtectedRoute />,
+      },
+    ],
+  },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: routesObject.wishingWall.path,
+        element: <WishingWallPage />,
+      },
+    ],
   },
 ]);

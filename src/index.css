@@ -32,6 +32,21 @@ body {
   display: none;
 }
 
+/* Disable browser autocomplete styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--color-input-bg) inset !important;
+  -webkit-text-fill-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Ensure autocomplete suggestions don't interfere */
+input[autocomplete="off"] {
+  background-color: var(--color-input-bg) !important;
+}
+
 /* Make datepicker full width of input */
 .react-datepicker-popper {
   width: 100% !important;
@@ -98,7 +113,7 @@ body {
 }
 
 .react-datepicker__day--outside-month {
-  color: #5D5D5D !important;
+  color: #5d5d5d !important;
 }
 
 .react-datepicker__navigation {
@@ -153,15 +168,22 @@ body {
 }
 
 /* Custom thin grey scrollbar for country dropdown */
-.country-scrollbar, .max-h-60.overflow-y-auto {
+.country-scrollbar,
+.max-h-60.overflow-y-auto {
   scrollbar-width: thin;
   scrollbar-color: #888 #171717;
 }
-.country-scrollbar::-webkit-scrollbar, .max-h-60.overflow-y-auto::-webkit-scrollbar {
+.country-scrollbar::-webkit-scrollbar,
+.max-h-60.overflow-y-auto::-webkit-scrollbar {
   width: 6px;
   background: #171717;
 }
-.country-scrollbar::-webkit-scrollbar-thumb, .max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
+.country-scrollbar::-webkit-scrollbar-thumb,
+.max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 6px;
+}
+
+.card-responsive {
+  padding: 0 !important;
 }

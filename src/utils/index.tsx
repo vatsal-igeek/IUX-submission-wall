@@ -1,3 +1,9 @@
+//! This file contains utility functions for authentication and cookie management.
+export const isAuthenticated = (accessToken:string | null) => {
+  const token = getCookie('iux-token');
+  // Check both localStorage token and Redux user state
+  return !!(token || accessToken);
+};
 
 // Cookie utility functions
 

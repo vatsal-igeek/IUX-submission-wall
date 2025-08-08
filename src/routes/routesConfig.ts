@@ -5,4 +5,7 @@ export const routesObject = {
   register: {
     path: "/register",
   },
+  wishingWall: {
+    path: "/wishing-wall",
+  },
 };
