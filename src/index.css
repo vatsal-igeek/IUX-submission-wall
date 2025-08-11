@@ -14,15 +14,21 @@
   --font-primary: "Manrope", sans-serif;
   --font-secondary: "Noto Sans", "Noto Sans SC", "Noto Sans Thai", sans-serif;
 
+  /* border color */
+  --color-border-primary: #EBF9F4;
+
   /* text color */
   --color-sub-title: #d1d1d1;
 
   /* input color */
   --color-input-bg: #171717;
+
+  /* card colors */
+  --color-card-creator: #E8E8E8
 }
 
 body {
-  background-color: #090909;
+  background-color: #000;
   color: #fff;
   font-family: var(--font-primary);
 }
@@ -171,12 +177,12 @@ input[autocomplete="off"] {
 .country-scrollbar,
 .max-h-60.overflow-y-auto {
   scrollbar-width: thin;
-  scrollbar-color: #888 #171717;
+  scrollbar-color: #888 var(--color-input-bg);
 }
 .country-scrollbar::-webkit-scrollbar,
 .max-h-60.overflow-y-auto::-webkit-scrollbar {
   width: 6px;
-  background: #171717;
+  background: var(--color-input-bg);
 }
 .country-scrollbar::-webkit-scrollbar-thumb,
 .max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
@@ -186,4 +192,15 @@ input[autocomplete="off"] {
 
 .card-responsive {
   padding: 0 !important;
+}
+
+
+/* Dashed border */
+.my-dashed-border {
+  border-top: 1px dashed var(--color-border-primary);
+  border-image: repeating-linear-gradient(
+    to right,
+    var(--color-border-primary) 0 7px,   /* dash color and length */
+    transparent 7px 15px /* gap after dash */
+  ) 1;
 }

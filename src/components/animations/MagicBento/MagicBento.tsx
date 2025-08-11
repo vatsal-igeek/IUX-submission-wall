@@ -694,7 +694,7 @@ const MagicBento: React.FC<BentoProps> = ({
               <button
                 key={index}
                 type={buttonType}
-                className={baseClassName}
+                className={`${baseClassName} z-10`}
                 style={cardStyle}
                 ref={(el) => {
                   if (!el) return;

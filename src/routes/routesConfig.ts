@@ -8,4 +8,10 @@ export const routesObject = {
   wishingWall: {
     path: "/wishing-wall",
   },
+  contentGuideline: {
+    path: "/content-guideline",
+  },
+  privacyPolicy: {
+    path: "/privacy-policy",
+  }
 };

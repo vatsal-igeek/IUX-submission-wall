@@ -22,6 +22,10 @@ export default {
         },
         subTitle: '#D1D1D1',
         inputBg: '#171717',
+        cardCreator : '#E8E8E8',
+        border: {
+          primary: '#EBF9F4'
+        }
       },
       fontFamily: {
         'primary': ['Manrope', 'sans-serif'],
