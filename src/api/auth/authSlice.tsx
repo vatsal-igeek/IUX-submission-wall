@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthStateType {
   accessToken: null | string;
-  dob: Date | null;
+  dob: string | null;
   captchaValue: string | null;
 }
 
@@ -23,7 +23,12 @@ const authSlice = createSlice({
       state.accessToken = null;
     },
     setDob: (state, action) => {
-      state.dob = action.payload;
+      // Convert Date object to ISO string if it's a Date, otherwise store as is
+      if (action.payload instanceof Date) {
+        state.dob = action.payload.toISOString();
+      } else {
+        state.dob = action.payload;
+      }
     },
     setCaptchaValue: (state, action) => {
       state.captchaValue = action.payload;

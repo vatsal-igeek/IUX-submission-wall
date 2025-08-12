@@ -65,12 +65,70 @@ const WishesCards = () => {
       timestamp: "12:00 AM GMT",
       location: "INDIA",
     },
+    {
+      id: 7,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: true,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
+    {
+      id: 8,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: false,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
+    {
+      id: 9,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: false,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
+    {
+      id: 10,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: true,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
+    {
+      id: 11,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: true,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
+    {
+      id: 12,
+      userName: "John D.",
+      message:
+        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
+      likes: 1500,
+      isLiked: false,
+      timestamp: "12:00 AM GMT",
+      location: "INDIA",
+    },
   ])
 
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
-  const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down")
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-  const lastScrollY = useRef(0)
 
   const handleLikeToggle = (id: number) => {
     setWishes((prevWishes) =>
@@ -90,43 +148,36 @@ const WishesCards = () => {
   }
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      setScrollDirection(currentScrollY > lastScrollY.current ? "down" : "up")
-      lastScrollY.current = currentScrollY
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const cardId = Number.parseInt(entry.target.getAttribute("data-card-id") || "0")
+          if (entry.isIntersecting) {
+            setVisibleCards((prev) => new Set([...prev, cardId]))
+          } else {
+            setVisibleCards((prev) => {
+              const newSet = new Set(prev)
+              newSet.delete(cardId)
+              return newSet
+            })
+          }
+        })
+      },
+      {
+        threshold: 0.5, // Card must be 50% visible to be considered "intersecting"
+        rootMargin: "10% 0px -25% 0px", // Negative margins to trigger when card goes halfway out
+      },
+    )
 
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            const cardId = Number.parseInt(entry.target.getAttribute("data-card-id") || "0")
-            if (entry.isIntersecting) {
-              setVisibleCards((prev) => new Set([...prev, cardId]))
-            } else {
-              setVisibleCards((prev) => {
-                const newSet = new Set(prev)
-                newSet.delete(cardId)
-                return newSet
-              })
-            }
-          })
-        },
-        {
-          threshold: 0.1,
-          rootMargin: "50px",
-        },
-      )
+    // Observe all cards
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref)
+    })
 
-      cardRefs.current.forEach((ref) => {
-        if (ref) observer.observe(ref)
-      })
-
-      return () => observer.disconnect()
+    // Cleanup function
+    return () => {
+      observer.disconnect()
     }
-
-    window.addEventListener("scroll", handleScroll)
-    handleScroll() // Initial call
-
-    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const getCardAnimation = (index: number, cardId: number) => {
@@ -143,7 +194,7 @@ const WishesCards = () => {
   }
 
   return (
-    <div className="py-[2.5rem] md:py-[3.75rem] lg:py-[6.25rem] min-h-screen">
+    <div className="py-[2.5rem] md:py-[3.75rem] lg:py-[6.25rem] min-h-screen overflow-x-hidden md:overflow-x-visible">
       <div className="container mx-auto w-full max-w-5xl px-4 md:px-28 lg:px-[1.875rem] xl:px-0">
         {/* Section Title */}
         <h2 className="mb-[2.5rem] md:mb-[3.75rem] text-[2.5rem] md:text-[3.75rem] lg:text-[4rem] font-extrabold text-center">
