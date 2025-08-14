@@ -215,10 +215,25 @@ export const authService = {
       genderCounts[gender] = (genderCounts[gender] || 0) + 1;
     });
     if (total === 0) return null;
+    // Calculate percentages so that sum is exactly 100%
     const genderPercentages: { [gender: string]: number } = {};
-    Object.entries(genderCounts).forEach(([gender, count]) => {
-      genderPercentages[gender] = Math.round((count / total) * 100);
+    const entries = Object.entries(genderCounts);
+    let sum = 0;
+    let maxKey = "";
+    let maxVal = 0;
+    entries.forEach(([gender, count]) => {
+      const percent = Math.round((count / total) * 100);
+      genderPercentages[gender] = percent;
+      sum += percent;
+      if (count > maxVal) {
+        maxVal = count;
+        maxKey = gender;
+      }
     });
+    // Adjust so total is 100%
+    if (sum !== 100 && maxKey) {
+      genderPercentages[maxKey] += 100 - sum;
+    }
     return { month, year, total, genderPercentages };
   },
 
@@ -251,10 +266,25 @@ export const authService = {
       genderCounts[gender] = (genderCounts[gender] || 0) + 1;
     });
     if (total === 0) return null;
+    // Calculate percentages so that sum is exactly 100%
     const genderPercentages: { [gender: string]: number } = {};
-    Object.entries(genderCounts).forEach(([gender, count]) => {
-      genderPercentages[gender] = Math.round((count / total) * 100);
+    const entries = Object.entries(genderCounts);
+    let sum = 0;
+    let maxKey = "";
+    let maxVal = 0;
+    entries.forEach(([gender, count]) => {
+      const percent = Math.round((count / total) * 100);
+      genderPercentages[gender] = percent;
+      sum += percent;
+      if (count > maxVal) {
+        maxVal = count;
+        maxKey = gender;
+      }
     });
+    // Adjust so total is 100%
+    if (sum !== 100 && maxKey) {
+      genderPercentages[maxKey] += 100 - sum;
+    }
     // Format weekStart and weekEnd as YYYY-MM-DD
     const weekStartStr = weekStart.toISOString().slice(0, 10);
     const weekEndStr = weekEnd.toISOString().slice(0, 10);
@@ -264,5 +294,189 @@ export const authService = {
       total,
       genderPercentages,
     };
+  },
+
+  async getCurrentDayGenderPercentageStats(): Promise<{
+    date: string;
+    total: number;
+    genderPercentages: { [gender: string]: number };
+  } | null> {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    let total = 0;
+    const genderCounts: { [gender: string]: number } = {};
+    usersSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt);
+      if (!createdAt || isNaN(createdAt.getTime())) return;
+      if (
+        createdAt.getDate() !== day ||
+        createdAt.getMonth() !== month ||
+        createdAt.getFullYear() !== year
+      )
+        return;
+      const gender = (data.gender || "other").toLowerCase();
+      total++;
+      genderCounts[gender] = (genderCounts[gender] || 0) + 1;
+    });
+    if (total === 0) return null;
+    // Calculate percentages so that sum is exactly 100%
+    const genderPercentages: { [gender: string]: number } = {};
+    const entries = Object.entries(genderCounts);
+    let sum = 0;
+    let maxKey = "";
+    let maxVal = 0;
+    entries.forEach(([gender, count]) => {
+      const percent = Math.round((count / total) * 100);
+      genderPercentages[gender] = percent;
+      sum += percent;
+      if (count > maxVal) {
+        maxVal = count;
+        maxKey = gender;
+      }
+    });
+    // Adjust so total is 100%
+    if (sum !== 100 && maxKey) {
+      genderPercentages[maxKey] += 100 - sum;
+    }
+    // Format date as YYYY-MM-DD
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+      day
+    ).padStart(2, "0")}`;
+    return { date: dateStr, total, genderPercentages };
+  },
+
+  async getCurrentMonthAgeGroupStats(): Promise<{
+    month: string;
+    year: number;
+    total: number;
+    lessThan25: number;
+    between25And65: number;
+    greaterThan65: number;
+  }> {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const now = new Date();
+    const month = now.toLocaleString("default", { month: "long" });
+    const year = now.getFullYear();
+    let total = 0;
+    let lessThan25 = 0;
+    let between25And65 = 0;
+    let greaterThan65 = 0;
+    usersSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate
+        ? data.createdAt.toDate()
+        : new Date(data.createdAt);
+      if (!createdAt || isNaN(createdAt.getTime())) return;
+      // Only count users registered this month
+      if (
+        createdAt.getMonth() !== now.getMonth() ||
+        createdAt.getFullYear() !== now.getFullYear()
+      )
+        return;
+      const dob = data.dob ? new Date(data.dob) : null;
+      console.log("DOB:", data.firstName, dob);
+      if (!dob || isNaN(dob.getTime())) return;
+      // Calculate age
+      let age = now.getFullYear() - dob.getFullYear();
+      const m = now.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) {
+        age--;
+      }
+      total++;
+      if (age < 25) lessThan25++;
+      else if (age <= 65) between25And65++;
+      else greaterThan65++;
+    });
+    return { month, year, total, lessThan25, between25And65, greaterThan65 };
+  },
+
+  async getLast7DaysTotalAgeGroupStats(): Promise<{
+    from: string;
+    to: string;
+    total: number;
+    lessThan25: number;
+    between25And65: number;
+    greaterThan65: number;
+  }> {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const now = new Date();
+    const fromDate = new Date(now);
+    fromDate.setDate(now.getDate() - 6);
+    fromDate.setHours(0, 0, 0, 0);
+    const toDate = new Date(now);
+    toDate.setHours(23, 59, 59, 999);
+    let total = 0;
+    let lessThan25 = 0;
+    let between25And65 = 0;
+    let greaterThan65 = 0;
+    usersSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+      if (!createdAt || isNaN(createdAt.getTime())) return;
+      if (createdAt < fromDate || createdAt > toDate) return;
+      const dob = data.dob ? new Date(data.dob) : null;
+      if (!dob || isNaN(dob.getTime())) return;
+      // Calculate age
+      let age = now.getFullYear() - dob.getFullYear();
+      const m = now.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) {
+        age--;
+      }
+      total++;
+      if (age < 25) lessThan25++;
+      else if (age <= 65) between25And65++;
+      else greaterThan65++;
+    });
+    const fromStr = `${fromDate.getFullYear()}-${String(fromDate.getMonth() + 1).padStart(2, '0')}-${String(fromDate.getDate()).padStart(2, '0')}`;
+    const toStr = `${toDate.getFullYear()}-${String(toDate.getMonth() + 1).padStart(2, '0')}-${String(toDate.getDate()).padStart(2, '0')}`;
+    return { from: fromStr, to: toStr, total, lessThan25, between25And65, greaterThan65 };
+  },
+
+  async getCurrentDayAgeGroupStats(): Promise<{
+    date: string;
+    total: number;
+    lessThan25: number;
+    between25And65: number;
+    greaterThan65: number;
+  }> {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    let total = 0;
+    let lessThan25 = 0;
+    let between25And65 = 0;
+    let greaterThan65 = 0;
+    usersSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+      if (!createdAt || isNaN(createdAt.getTime())) return;
+      if (
+        createdAt.getDate() !== day ||
+        createdAt.getMonth() !== month ||
+        createdAt.getFullYear() !== year
+      ) return;
+      const dob = data.dob ? new Date(data.dob) : null;
+      if (!dob || isNaN(dob.getTime())) return;
+      // Calculate age
+      let age = now.getFullYear() - dob.getFullYear();
+      const m = now.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) {
+        age--;
+      }
+      total++;
+      if (age < 25) lessThan25++;
+      else if (age <= 65) between25And65++;
+      else greaterThan65++;
+    });
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return { date: dateStr, total, lessThan25, between25And65, greaterThan65 };
   },
 };

@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 interface AuthStateType {
   accessToken: null | string;
-  dob: string | null;
+  dob: any | null;
   captchaValue: string | null;
 }
 
