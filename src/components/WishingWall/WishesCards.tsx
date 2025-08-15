@@ -1,197 +1,115 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 
-import { FillHeartSvg, HeartSvg } from "../../icons"
+import { FillHeartSvg, HeartSvg } from "../../icons";
+import { wishService } from "../../api/wish/endPoints";
+
+type Wish = {
+  id: string;
+  userName: string;
+  message: string;
+  likes: number;
+  isLiked: boolean;
+  timestamp: string;
+  location: string;
+};
 
 const WishesCards = () => {
   // Sample data for wish cards
-  const [wishes, setWishes] = useState([
-    {
-      id: 1,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 2,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 3,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 4,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 5,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 6,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 7,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 8,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 9,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 10,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 11,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: true,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-    {
-      id: 12,
-      userName: "John D.",
-      message:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia, molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium optio, eaque rerum!",
-      likes: 1500,
-      isLiked: false,
-      timestamp: "12:00 AM GMT",
-      location: "INDIA",
-    },
-  ])
+  const [wishes, setWishes] = useState<Wish[]>([]);
 
-  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  useEffect(() => {
+    const fetchWishes = async () => {
+      try {
+        const data = await wishService.getAllWishes();
+        const wishesData: Wish[] = data.map((item: any) => ({
+          id: item.id,
+          userName: item.userName ?? item.user?.name ?? "Anonymous",
+          message: item.message ?? "",
+          likes: item.likes ?? 0,
+          isLiked: item.isLiked ?? false,
+          timestamp: item.timestamp ?? "",
+          location: item.location ?? "",
+        }));
+        setWishes(wishesData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchWishes();
+  }, []);
 
-  const handleLikeToggle = (id: number) => {
-    setWishes((prevWishes) =>
-      prevWishes.map((wish) =>
-        wish.id === id
-          ? { ...wish, isLiked: !wish.isLiked, likes: wish.isLiked ? wish.likes - 1 : wish.likes + 1 }
-          : wish,
-      ),
-    )
-  }
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const handleLikeToggle = (id: string) => {
+    console.log(`Toggling like for wish ID: ${id}`);
+    // setWishes((prevWishes) =>
+    //   prevWishes.map((wish) =>
+    //     wish.id === id
+    //       ? {
+    //           ...wish,
+    //           isLiked: !wish.isLiked,
+    //           likes: wish.isLiked ? wish.likes - 1 : wish.likes + 1,
+    //         }
+    //       : wish
+    //   )
+    // );
+  };
 
   const formatLikes = (likes: number) => {
     if (likes >= 1000) {
-      return `${(likes / 1000).toFixed(1)}K`
+      return `${(likes / 1000).toFixed(1)}K`;
     }
-    return likes.toString()
-  }
+    return likes.toString();
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const cardId = Number.parseInt(entry.target.getAttribute("data-card-id") || "0")
+          const cardId = Number.parseInt(
+            entry.target.getAttribute("data-card-id") || "0"
+          );
           if (entry.isIntersecting) {
-            setVisibleCards((prev) => new Set([...prev, cardId]))
+            setVisibleCards((prev) => new Set([...prev, String(cardId)]));
           } else {
             setVisibleCards((prev) => {
-              const newSet = new Set(prev)
-              newSet.delete(cardId)
-              return newSet
-            })
+              const newSet = new Set(prev);
+              newSet.delete(String(cardId));
+              return newSet;
+            });
           }
-        })
+        });
       },
       {
         threshold: 0.5, // Card must be 50% visible to be considered "intersecting"
         rootMargin: "10% 0px -25% 0px", // Negative margins to trigger when card goes halfway out
-      },
-    )
+      }
+    );
 
     // Observe all cards
     cardRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref)
-    })
+      if (ref) observer.observe(ref);
+    });
 
     // Cleanup function
     return () => {
-      observer.disconnect()
-    }
-  }, [])
+      observer.disconnect();
+    };
+  }, []);
 
-  const getCardAnimation = (index: number, cardId: number) => {
-    const isVisible = visibleCards.has(cardId)
-    const isEven = index % 2 === 0
+  const getCardAnimation = (index: number, cardId: string) => {
+    const isVisible = visibleCards.has(cardId);
+    const isEven = index % 2 === 0;
 
     if (!isVisible) {
       return isEven
         ? "translate-x-[-100px] opacity-0 rotate-[-15deg] scale-95"
-        : "translate-x-[100px] opacity-0 rotate-[15deg] scale-95"
+        : "translate-x-[100px] opacity-0 rotate-[15deg] scale-95";
     }
 
-    return "translate-x-0 opacity-100 rotate-0 scale-100"
-  }
+    return "translate-x-0 opacity-100 rotate-0 scale-100";
+  };
 
   return (
     <div className="py-[2.5rem] md:py-[3.75rem] lg:py-[6.25rem] min-h-screen overflow-x-hidden md:overflow-x-visible">
@@ -207,16 +125,23 @@ const WishesCards = () => {
             <div
               key={wish.id}
               ref={(el) => {
-                cardRefs.current[index] = el
+                cardRefs.current[index] = el;
               }}
               data-card-id={wish.id}
-              className={`bg-inputBg rounded-2xl p-6 shadow-lg transition-all duration-700 ease-out transform ${getCardAnimation(index, wish.id)}`}
+              className={`bg-inputBg rounded-2xl p-6 shadow-lg transition-all duration-700 ease-out transform ${getCardAnimation(
+                index,
+                wish.id
+              )}`}
             >
               {/* Header Section */}
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl md:text-[2rem] font-bold text-cardCreator">{wish.userName}</h3>
+                <h3 className="text-2xl md:text-[2rem] font-bold text-cardCreator">
+                  {wish.userName}
+                </h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-lg md:text-xl">{formatLikes(wish.likes)}</span>
+                  <span className="text-lg md:text-xl">
+                    {formatLikes(wish.likes)}
+                  </span>
                   <div
                     onClick={() => handleLikeToggle(wish.id)}
                     className="cursor-pointer transition-transform duration-200 hover:scale-110"
@@ -226,7 +151,9 @@ const WishesCards = () => {
                 </div>
               </div>
 
-              <p className="text-sm md:text-base leading-relaxed text-subTitle">{wish.message}</p>
+              <p className="text-sm md:text-base leading-relaxed text-subTitle">
+                {wish.message}
+              </p>
 
               <div className="mt-[1.875rem] text-primary-main text-sm md:text-base font-medium">
                 <div className="flex items-center">
@@ -240,7 +167,7 @@ const WishesCards = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WishesCards
+export default WishesCards;

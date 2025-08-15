@@ -25,6 +25,7 @@ export interface BentoProps {
   buttonText?: string;
   width?: string;
   buttonType?: "submit" | "button";
+  isDisabled?: boolean;
 }
 
 const DEFAULT_PARTICLE_COUNT = 12;
@@ -110,7 +111,11 @@ const ParticleCard: React.FC<{
 
     const { width, height } = cardRef.current.getBoundingClientRect();
     memoizedParticles.current = Array.from({ length: particleCount }, () =>
-      createParticleElement(Math.random() * width, Math.random() * height, glowColor)
+      createParticleElement(
+        Math.random() * width,
+        Math.random() * height,
+        glowColor
+      )
     );
     particlesInitialized.current = true;
   }, [particleCount, glowColor]);
@@ -405,7 +410,8 @@ const GlobalSpotlight: React.FC<{
         return;
       }
 
-      const { proximity, fadeDistance } = calculateSpotlightValues(spotlightRadius);
+      const { proximity, fadeDistance } =
+        calculateSpotlightValues(spotlightRadius);
       let minDistance = Infinity;
 
       cards.forEach((card) => {
@@ -424,10 +430,17 @@ const GlobalSpotlight: React.FC<{
         if (effectiveDistance <= proximity) {
           glowIntensity = 1;
         } else if (effectiveDistance <= fadeDistance) {
-          glowIntensity = (fadeDistance - effectiveDistance) / (fadeDistance - proximity);
+          glowIntensity =
+            (fadeDistance - effectiveDistance) / (fadeDistance - proximity);
         }
 
-        updateCardGlowProperties(cardElement, e.clientX, e.clientY, glowIntensity, spotlightRadius);
+        updateCardGlowProperties(
+          cardElement,
+          e.clientX,
+          e.clientY,
+          glowIntensity,
+          spotlightRadius
+        );
       });
 
       gsap.to(spotlightRef.current, {
@@ -495,7 +508,8 @@ const useMobileDetection = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
+    const checkMobile = () =>
+      setIsMobile(window.innerWidth <= MOBILE_BREAKPOINT);
 
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -521,7 +535,9 @@ const MagicBento: React.FC<BentoProps> = ({
   buttonText = "Button Text",
   width = "auto",
   buttonType = "button",
+  isDisabled,
 }) => {
+  console.log("isDisabled=====", isDisabled);
   const gridRef = useRef<HTMLDivElement>(null);
   const isMobile = useMobileDetection();
   const shouldDisableAnimations = disableAnimations || isMobile;
@@ -676,15 +692,18 @@ const MagicBento: React.FC<BentoProps> = ({
                   disableAnimations={shouldDisableAnimations}
                   particleCount={particleCount}
                   glowColor={glowColor}
-                  enableTilt={enableTilt}
-                  clickEffect={clickEffect}
-                  enableMagnetism={enableMagnetism}
+                  enableTilt={!isDisabled && enableTilt}
+                  clickEffect={!isDisabled && clickEffect}
+                  enableMagnetism={!isDisabled && enableMagnetism}
                 >
                   <button
                     type={buttonType}
+                    disabled={isDisabled}
                     className="card__header justify-center gap-3 contents sm:flex relative text-white text-center w-full h-full bg-transparent border-none cursor-pointer"
                   >
-                    <span className="card__label text-[14px] xs:text-base">{card.label}</span>
+                    <span className="card__label text-[14px] xs:text-base">
+                      {card.label}
+                    </span>
                   </button>
                 </ParticleCard>
               );
@@ -694,6 +713,7 @@ const MagicBento: React.FC<BentoProps> = ({
               <button
                 key={index}
                 type={buttonType}
+                disabled={isDisabled}
                 className={`${baseClassName} z-10`}
                 style={cardStyle}
                 ref={(el) => {

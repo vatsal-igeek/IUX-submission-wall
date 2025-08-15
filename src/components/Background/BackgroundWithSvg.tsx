@@ -1,6 +1,13 @@
 import { useLocation } from "react-router-dom";
 
-import { BgBottomCenterMobileSvg, BgBottomCenterSvg, BgRightCenterMobileSvg, BgRightCenterSvg, BgTopLeftMobileSvg, BgTopLeftSvg } from "../../icons";
+import {
+  BgBottomCenterMobileSvg,
+  BgBottomCenterSvg,
+  BgRightCenterMobileSvg,
+  BgRightCenterSvg,
+  BgTopLeftMobileSvg,
+  BgTopLeftSvg,
+} from "../../icons";
 // import Galaxy from "../animations/Galaxy/Galaxy";
 
 const BackgroundWithSvg = () => {
@@ -26,7 +33,7 @@ const BackgroundWithSvg = () => {
           focal={[0.1, 0.1]}
           transparent={true}
         /> */}
-        
+
         {/* BgTopLeftSvg - fixed at top-left */}
         <div className="fixed hidden md:block top-0 left-0 z-20 pointer-events-none">
           <BgTopLeftSvg />
@@ -44,10 +51,18 @@ const BackgroundWithSvg = () => {
         </div>
 
         {/* BgBottomCenterSvg - bottom center */}
-        <div className={`fixed hidden md:block left-0 w-full z-20 pointer-events-none ${isRegisterPage ? "-bottom-[9rem]" : "bottom-0"}`}>
+        <div
+          className={`fixed hidden md:block left-0 w-full z-20 pointer-events-none ${
+            isRegisterPage ? "-bottom-[9rem]" : "bottom-0"
+          }`}
+        >
           <BgBottomCenterSvg />
         </div>
-        <div className={`fixed block md:hidden bottom-0 left-0 w-full z-20 pointer-events-none ${isRegisterPage ? "-bottom-[9rem]" : "bottom-0"}`}>
+        <div
+          className={`fixed block md:hidden bottom-0 left-0 w-full z-20 pointer-events-none ${
+            isRegisterPage ? "-bottom-[9rem]" : "bottom-0"
+          }`}
+        >
           <BgBottomCenterMobileSvg />
         </div>
       </div>

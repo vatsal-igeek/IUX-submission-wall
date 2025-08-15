@@ -6,39 +6,34 @@ import {
   orderBy,
   limit,
   startAfter,
+  doc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import type { Wish } from "../../types/wishesh";
 
 export const wishService = {
   // Add wish to wishes collection
-  async addWish(wish: Wish): Promise<string> {
+
+  async addWish(wish: { text: string; userId: string }): Promise<string> {
     try {
       if (!wish.userId || !wish.text) {
         throw new Error("userId and text are required");
       }
+
       const wishData = {
-        userId: wish.userId,
         text: wish.text,
-        createdAt: new Date(),
-        timestamp:
-          wish.timestamp ||
-          new Date().toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-            timeZoneName: "short",
-          }),
-        location: wish.location || "INDIA",
+        createdAt: serverTimestamp(),
+        userId: doc(db, "users", wish.userId),
       };
+
       const docRef = await addDoc(collection(db, "wishes"), wishData);
       return docRef.id;
     } catch (error) {
       console.error("Error adding wish:", error);
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Failed to add wish to database");
+      throw error instanceof Error
+        ? error
+        : new Error("Failed to add wish to database");
     }
   },
 
@@ -76,7 +71,7 @@ export const wishService = {
           ...wish,
           id: doc.id,
           user: usersMap[wish.userId]?.firstName || "Unknown",
-          location : usersMap[wish.userId]?.location || "INDIA",
+          location: usersMap[wish.userId]?.location || "INDIA",
         };
       });
     } catch (error) {
@@ -126,7 +121,7 @@ export const wishService = {
           ...wish,
           id: doc.id,
           user: usersMap[wish.userId]?.firstName || "Unknown",
-          location : usersMap[wish.userId]?.location || "INDIA",
+          location: usersMap[wish.userId]?.location || "INDIA",
         };
       });
 
@@ -184,7 +179,7 @@ export const wishService = {
           ...wish,
           id: doc.id,
           user: usersMap[wish.userId]?.firstName || "Unknown",
-          location : usersMap[wish.userId]?.location || "INDIA",
+          location: usersMap[wish.userId]?.location || "INDIA",
         };
       });
 
@@ -230,7 +225,7 @@ export const wishService = {
           ...wish,
           id: doc.id,
           user: usersMap[wish.userId]?.firstName || "Unknown",
-          location : usersMap[wish.userId]?.location || "INDIA",
+          location: usersMap[wish.userId]?.location || "INDIA",
         };
       });
 

@@ -15,7 +15,7 @@
   --font-secondary: "Noto Sans", "Noto Sans SC", "Noto Sans Thai", sans-serif;
 
   /* border color */
-  --color-border-primary: #EBF9F4;
+  --color-border-primary: #ebf9f4;
 
   /* text color */
   --color-sub-title: #d1d1d1;
@@ -24,7 +24,7 @@
   --color-input-bg: #171717;
 
   /* card colors */
-  --color-card-creator: #E8E8E8
+  --color-card-creator: #e8e8e8;
 }
 
 body {
@@ -194,13 +194,24 @@ input[autocomplete="off"] {
   padding: 0 !important;
 }
 
-
 /* Dashed border */
 .my-dashed-border {
   border-top: 1px dashed var(--color-border-primary);
   border-image: repeating-linear-gradient(
-    to right,
-    var(--color-border-primary) 0 7px,   /* dash color and length */
-    transparent 7px 15px /* gap after dash */
-  ) 1;
+      to right,
+      var(--color-border-primary) 0 7px,
+      /* dash color and length */ transparent 7px 15px /* gap after dash */
+    )
+    1;
+}
+
+/* Font Size class */
+.font-size-4rem {
+  @apply text-[2.5rem] md:text-[3.75rem] lg:text-[4rem];
+}
+.font-size-1_5rem {
+  @apply text-[1rem] md:text-[1.25rem] lg:text-[1.5rem];
+}
+.font-size-2rem {
+  @apply text-[1.5rem] md:text-[1.75rem] lg:text-[2rem];
 }
