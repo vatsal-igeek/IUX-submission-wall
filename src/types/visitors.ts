@@ -1,5 +1,4 @@
 export interface Visitor {
-  cookies: string;
-  key: string;
+  uuid: string;
   createdAt?: Date;
 }

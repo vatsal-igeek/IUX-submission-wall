@@ -8,9 +8,11 @@ import {
   doc,
   serverTimestamp,
   DocumentReference,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import type { Wish } from "../../types/wishesh";
+import type { User } from "../../types/userType";
 
 export const wishService = {
 
@@ -37,45 +39,29 @@ export const wishService = {
   },
 
   // Get wishes with pagination and limit, sorted by latest first
-  async getAllWishes(
-    pageLimit: number = 10, // should be Firestore Timestamp
-    currentUserId?: string
-  ): Promise<
-    Array<
-      Wish & {
-        id: string;
-        user?: any;
-        location?: string;
-        likeCount: number;
-        isLiked: boolean;
-      }
-    >
-  > {
-    try {
-    let wishesQuery;
-    // if (lastCreatedAt) {
-    //   wishesQuery = query(
-    //     collection(db, "wishes"),
-    //     orderBy("createdAt", "desc"),
-    //     startAfter(lastCreatedAt),
-    //     limit(pageLimit)
-    //   );
-    // } else {
-      wishesQuery = query(
-        collection(db, "wishes"),
-        orderBy("createdAt", "desc"),
-        limit(pageLimit)
-      );
-    // }
+
+async getAllWishes(
+  pageLimit: number = 10,
+  currentUserId?: string
+): Promise<
+  Array<
+    Wish & {
+      id: string;
+      userRef: DocumentReference; // actual reference
+      user?: any;                 // full user data
+      likeCount: number;
+      isLiked: boolean;
+    }
+  >
+> {
+  try {
+    let wishesQuery = query(
+      collection(db, "wishes"),
+      orderBy("createdAt", "desc"),
+      limit(pageLimit)
+    );
 
     const wishesSnapshot = await getDocs(wishesQuery);
-
-    // Fetch all users once
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    const usersMap: { [id: string]: any } = {};
-    usersSnapshot.forEach((docSnap) => {
-      usersMap[docSnap.id] = docSnap.data();
-    });
 
     // Fetch all likes once
     const likesSnapshot = await getDocs(collection(db, "wishLikes"));
@@ -102,24 +88,32 @@ export const wishService = {
       likesMap[wishId].push(userId);
     });
 
-    return wishesSnapshot.docs.map((docSnap) => {
-      const wish = docSnap.data() as Wish & { userId: any };
-      const userId =
-        wish.userId instanceof DocumentReference ? wish.userId.id : wish.userId;
+    // 🔹 Fetch users on demand for each wish
+    const wishesWithUsers = await Promise.all(
+      wishesSnapshot.docs.map(async (docSnap) => {
+        const wish = docSnap.data() as Wish & { userId: any };
+        const userId =
+          wish.userId instanceof DocumentReference ? wish.userId.id : wish.userId;
 
-      const likedByArr = likesMap[docSnap.id] || [];
-      const isLiked = currentUserId ? likedByArr.includes(currentUserId) : false;
+        const userRef = doc(db, "users", userId);
+        const userSnap = await getDoc(userRef); // get user data directly
+        const userData = userSnap.exists() ? userSnap.data() : null;
 
-      return {
-        ...wish,
-        id: docSnap.id,
-        userId,
-        user: usersMap[userId]?.firstName || "Unknown",
-        location: usersMap[userId]?.country || "INDIA",
-        likeCount: likedByArr.length, // total likes
-        isLiked,
-      };
-    });
+        const likedByArr = likesMap[docSnap.id] || [];
+        const isLiked = currentUserId ? likedByArr.includes(currentUserId) : false;
+
+        return {
+          ...wish,
+          id: docSnap.id,
+          userRef,   // Firestore reference
+          user: userData, // full user object from Firestore
+          likeCount: likedByArr.length,
+          isLiked,
+        };
+      })
+    );
+
+    return wishesWithUsers;
   } catch (error) {
     console.error("Error fetching wishes:", error);
     throw new Error("Failed to fetch wishes");

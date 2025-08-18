@@ -1,43 +1,33 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  query,
-  serverTimestamp,
-  where,
-} from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, collection, getCountFromServer } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
 import { db } from "../../firebase-config";
-import type { Visitor } from "../../types/visitors";
 
 export const visitorService = {
-  async addVisitor(visitor: Visitor): Promise<string | null> {
+  async addVisitor() {
     try {
-      const userRef = doc(db, "users", visitor.cookies);
-      const q = query(
-        collection(db, "visitors"),
-        where("cookies", "==", userRef)
-      );
-      const q2 = query(
-        collection(db, "visitors"),
-        where("key", "==", visitor.key)
-      );
-      const [cookiesSnap, keySnap] = await Promise.all([
-        getDocs(q),
-        getDocs(q2),
-      ]);
-      if (!cookiesSnap.empty || !keySnap.empty) {
-        return null;
-      }
-      const docRef = await addDoc(collection(db, "visitors"), {
-        ...visitor,
-        cookies : userRef,
+      const visitorId = uuidv4();
+      const visitorRef = doc(db, "uniquevisitors", visitorId);
+
+      await setDoc(visitorRef, {
+        uuid: visitorId,
         createdAt: serverTimestamp(),
       });
-      return docRef.id;
+
+      return visitorId;
     } catch (error) {
-      console.error("Error adding visitor:", error);
-      throw new Error("Failed to add visitor");
+      console.error("Error adding unique visitor:", error);
+      throw new Error("Failed to add unique visitor");
     }
   },
+
+  async  getUniqueVisitorsCount() {
+    try {
+        const coll = collection(db, "visitors");
+        const snapshot = await getCountFromServer(coll);
+        return snapshot.data().count;
+    } catch (error) {
+        console.error("Error fetching unique visitors count:", error);
+        throw new Error("Failed to fetch unique visitors count");
+    }
+}
 };
