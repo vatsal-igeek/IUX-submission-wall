@@ -9,6 +9,10 @@ import {
   // updateDoc,
   // arrayUnion,
   deleteDoc,
+  doc,
+  DocumentReference,
+  getDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 // import type { WishLike } from "../../types/wishLike";
@@ -16,40 +20,14 @@ import { db } from "../../firebase-config";
 // Add a like to a wish
 export const wishLikeService = {
   // Toggle like/dislike for a wish by a user
-  // async toggleLike(wishId: string, userId: string): Promise<void> {
-  //   const likesQuery = query(
-  //     collection(db, "wishLikes"),
-  //     where("wishId", "==", wishId)
-  //   );
-  //   const likesSnapshot = await getDocs(likesQuery);
-  //   if (!likesSnapshot.empty) {
-  //     const likeDoc = likesSnapshot.docs[0];
-  //     const userIds: string[] = likeDoc.data().userIds || [];
-  //     if (userIds.includes(userId)) {
-  //       // Remove userId (dislike)
-  //       await updateDoc(likeDoc.ref, {
-  //         userIds: userIds.filter((id) => id !== userId),
-  //       });
-  //     } else {
-  //       // Add userId (like)
-  //       await updateDoc(likeDoc.ref, {
-  //         userIds: arrayUnion(userId),
-  //       });
-  //     }
-  //   } else {
-  //     // Create new document with like
-  //     await addDoc(collection(db, "wishLikes"), {
-  //       wishId,
-  //       userIds: [userId],
-  //       createdAt: new Date(),
-  //     });
-  //   }
-  // },
   async toggleLike(wishId: string, userId: string): Promise<void> {
+    // Use Firestore document references for wishId and userId
+    const wishRef = doc(db, "wishes", wishId);
+    const userRef = doc(db, "users", userId);
     const likesQuery = query(
       collection(db, "wishLikes"),
-      where("wishId", "==", wishId),
-      where("userId", "==", userId) // only this user's like
+      where("wishId", "==", wishRef),
+      where("userId", "==", userRef)
     );
 
     const likesSnapshot = await getDocs(likesQuery);
@@ -61,24 +39,85 @@ export const wishLikeService = {
     } else {
       // Like → create a new doc for this user
       await addDoc(collection(db, "wishLikes"), {
-        wishId,
-        userId,
-        createdAt: new Date(),
+        wishId: wishRef,
+        userId: userRef,
+        createdAt: serverTimestamp(),
       });
     }
   },
 
   // Get likes for a wish
-  async getAllLikes(): Promise<{ [wishId: string]: string[] }> {
-    const likesSnapshot = await getDocs(collection(db, "wishLikes"));
-    const likesMap: { [wishId: string]: string[] } = {};
-    likesSnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (!likesMap[data.wishId]) likesMap[data.wishId] = [];
-      if (data.userId) likesMap[data.wishId].push(data.userId);
-    });
-    return likesMap;
-  },
+async getAllLikes(): Promise<
+  {
+    wishId: string;
+    wishData: any;
+    wishOwner?: any;
+    likedBy: string[];
+  }[]
+> {
+  const likesSnapshot = await getDocs(collection(db, "wishLikes"));
+
+  // Step 1: Build mapping wishId → userIds who liked
+  const likesMap: { [wishId: string]: string[] } = {};
+  likesSnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+
+    let wishId: string | null = null;
+    let userId: string | null = null;
+
+    if (data.wishId instanceof DocumentReference) {
+      wishId = data.wishId.id;
+    } else if (typeof data.wishId === "string") {
+      wishId = data.wishId;
+    }
+
+    if (data.userId instanceof DocumentReference) {
+      userId = data.userId.id;
+    } else if (typeof data.userId === "string") {
+      userId = data.userId;
+    }
+
+    if (!wishId || !userId) return;
+
+    if (!likesMap[wishId]) likesMap[wishId] = [];
+    likesMap[wishId].push(userId);
+  });
+
+  // Step 2: Fetch each wish + its owner
+  const results: {
+    wishId: string;
+    wishData: any;
+    wishOwner?: any;
+    likedBy: string[];
+  }[] = [];
+
+  for (const wishId of Object.keys(likesMap)) {
+    const wishRef = doc(db, "wishes", wishId);
+    const wishSnap = await getDoc(wishRef);
+
+    if (wishSnap.exists()) {
+      const wishData = wishSnap.data();
+
+      // --- Fetch wish owner details ---
+      let wishOwner: any = null;
+      if (wishData.userId instanceof DocumentReference) {
+        const ownerSnap = await getDoc(wishData.userId);
+        if (ownerSnap.exists()) {
+          wishOwner = { id: ownerSnap.id, ...ownerSnap.data() };
+        }
+      }
+
+      results.push({
+        wishId,
+        wishData,
+        wishOwner,
+        likedBy: likesMap[wishId], // just IDs of users who liked
+      });
+    }
+  }
+
+  return results;
+},
 
   async getTotalLikes(): Promise<number> {
     const likesSnapshot = await getDocs(collection(db, "wishLikes"));
