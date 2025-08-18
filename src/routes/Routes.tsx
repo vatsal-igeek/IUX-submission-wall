@@ -7,6 +7,9 @@ import { RegisterProtectedRoute } from "./RegisterProtectedRoute";
 import { routesObject } from "./routesConfig";
 import PrivacyPolicyPage from "../pages/privacyPolicy/PrivacyPolicyPage";
 import ContentGuidelinePage from "../pages/contentGuideline/ContentGuidelinePage";
+import AdminLoginPage from "../pages/admin/login/LoginPage";
+import AdminProtectedRoute from "./AdminProtectedRoute";
+import DashboardPage from "../pages/admin/dashboard/DashboardPage";
 
 // Create a router
 export const router = createBrowserRouter([
@@ -37,6 +40,21 @@ export const router = createBrowserRouter([
       {
         path: routesObject.contentGuideline.path,
         element: <ContentGuidelinePage />,
+      },
+    ],
+  },
+
+  // ----------------- Admin Routes -----------------
+  {
+    path: routesObject.admin.login.path,
+    element: <AdminLoginPage />,
+  },
+  {
+    element: <AdminProtectedRoute />,
+    children: [
+      {
+        path: routesObject.admin.dashboard.path,
+        element: <DashboardPage />,
       },
     ],
   },

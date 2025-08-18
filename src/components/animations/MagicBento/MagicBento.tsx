@@ -537,7 +537,6 @@ const MagicBento: React.FC<BentoProps> = ({
   buttonType = "button",
   isDisabled,
 }) => {
-  console.log("isDisabled=====", isDisabled);
   const gridRef = useRef<HTMLDivElement>(null);
   const isMobile = useMobileDetection();
   const shouldDisableAnimations = disableAnimations || isMobile;
