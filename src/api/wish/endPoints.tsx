@@ -16,8 +16,8 @@ import type { User } from "../../types/userType";
 
 export interface WishWithMeta extends Wish {
   id: string;
-  userRef: DocumentReference;
-  user?: User | null;
+  // userRef: DocumentReference;
+  // user?: User | null;
   likeCount: number;
   isLiked: boolean;
 }
@@ -99,9 +99,20 @@ export const wishService = {
 
           const userRef = doc(db, "users", userId);
           const userSnap = await getDoc(userRef);
-          const userData = userSnap.exists()
-            ? ({ id: userSnap.id, ...userSnap.data() } as User)
-            : null;
+
+          let userData: {
+            firstName: string;
+            lastName: string;
+            country: string;
+          } | null = null;
+          if (userSnap.exists()) {
+            const data = userSnap.data() as User;
+            userData = {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              country: data.country,
+            };
+          }
 
           const likedByArr = likesMap[docSnap.id] || [];
           const isLiked = currentUserId
@@ -111,7 +122,8 @@ export const wishService = {
           return {
             ...wish,
             id: docSnap.id,
-            userRef,
+            userId,
+            // userRef,
             user: userData,
             likeCount: likedByArr.length,
             isLiked,
@@ -202,11 +214,12 @@ export const wishService = {
 
   async getTopTwoWishesByLikes(currentUserId: string): Promise<WishWithMeta[]> {
     try {
+      // 1. Collect likes
       const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
       const likesMap: { [wishId: string]: string[] } = {};
 
-      wishLikesSnapshot.forEach((doc) => {
-        const data = doc.data();
+      wishLikesSnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
         const wishId =
           data.wishId && typeof data.wishId === "object" && "id" in data.wishId
             ? data.wishId.id
@@ -215,134 +228,163 @@ export const wishService = {
           data.userId && typeof data.userId === "object" && "id" in data.userId
             ? data.userId.id
             : data.userId;
+
         if (!wishId || !userId) return;
         if (!likesMap[wishId]) likesMap[wishId] = [];
         likesMap[wishId].push(userId);
       });
 
-      // Sort by likes count descending and get top 2
+      // 2. Sort & pick top 2
       const topLikes = Object.entries(likesMap)
         .map(([wishId, userIds]) => ({ wishId, userIds }))
         .sort((a, b) => b.userIds.length - a.userIds.length)
         .slice(0, 2);
 
-      // Fetch wishes and users
-      const wishesSnapshot = await getDocs(collection(db, "wishes"));
-      const usersSnapshot = await getDocs(collection(db, "users"));
+      // 3. Resolve each wish + user from Firestore directly
+      const result = await Promise.all(
+        topLikes.map(async (like) => {
+          const wishRef = doc(db, "wishes", like.wishId);
+          const wishSnap = await getDoc(wishRef);
 
-      const usersMap: { [id: string]: User } = {};
-      usersSnapshot.forEach((doc) => {
-        usersMap[doc.id] = { id: doc.id, ...(doc.data() as User) };
-      });
+          if (!wishSnap.exists()) return null;
+          const wishData = wishSnap.data() as Wish & { userId: any };
 
-      const wishesMap: { [id: string]: Wish } = {};
-      wishesSnapshot.forEach((doc) => {
-        wishesMap[doc.id] = { ...(doc.data() as Wish), id: doc.id } as Wish & { id: string };
-      });
-
-      // Build result array
-      const result: WishWithMeta[] = topLikes
-        .map((like) => {
-          const wish = wishesMap[like.wishId];
-          if (!wish) return null;
+          // Resolve user reference
           const userId =
-            wish.userId &&
-            typeof wish.userId === "object" &&
-            "id" in wish.userId
-              ? (wish.userId as { id: string }).id
-              : wish.userId;
+            wishData.userId &&
+            typeof wishData.userId === "object" &&
+            "id" in wishData.userId
+              ? wishData.userId.id
+              : wishData.userId;
+
           const userRef = doc(db, "users", userId);
-          const user = usersMap[userId] || null;
+          const userSnap = await getDoc(userRef);
+
+          let userData: {
+            id: string;
+            firstName?: string;
+            lastName?: string;
+            country?: string;
+          } | null = null;
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            userData = {
+              id: userSnap.id,
+              firstName: data.firstName ,
+              lastName: data.lastName ,
+              country: data.country,
+            };
+          }
+
           const likeCount = like.userIds.length;
           const isLiked = currentUserId
             ? like.userIds.includes(currentUserId)
             : false;
 
           return {
-            ...wish,
-            id: like.wishId,
-            userRef,
-            user,
+            ...wishData,
+            id: wishSnap.id,
+            userId,
+            user: userData, // 🔹 minimal user info
             likeCount,
             isLiked,
-          };
+          } as WishWithMeta;
         })
-        .filter(Boolean) as WishWithMeta[];
+      );
 
-      return result;
+      return result.filter((wish): wish is WishWithMeta => wish !== null);
     } catch (error) {
       console.error("Error fetching top two wishes by likes:", error);
       throw new Error("Failed to fetch top two wishes by likes");
     }
   },
 
- async getTopFiveWishesByLikes(currentUserId: string): Promise<WishWithMeta[]> {
-  try {
-    const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
-    const likesMap: { [wishId: string]: string[] } = {};
+  async getTopFiveWishesByLikes(
+    currentUserId: string
+  ): Promise<WishWithMeta[]> {
+   try {
+      // 1. Collect likes
+      const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
+      const likesMap: { [wishId: string]: string[] } = {};
 
-    wishLikesSnapshot.forEach((doc) => {
-      const data = doc.data();
-      const wishId =
-        data.wishId && typeof data.wishId === "object" && "id" in data.wishId
-          ? data.wishId.id
-          : data.wishId;
-      const userId =
-        data.userId && typeof data.userId === "object" && "id" in data.userId
-          ? data.userId.id
-          : data.userId;
-      if (!wishId || !userId) return;
-      if (!likesMap[wishId]) likesMap[wishId] = [];
-      likesMap[wishId].push(userId);
-    });
+      wishLikesSnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const wishId =
+          data.wishId && typeof data.wishId === "object" && "id" in data.wishId
+            ? data.wishId.id
+            : data.wishId;
+        const userId =
+          data.userId && typeof data.userId === "object" && "id" in data.userId
+            ? data.userId.id
+            : data.userId;
 
-    // Sort by likes count descending and get top 5
-    const topLikes = Object.entries(likesMap)
-      .map(([wishId, userIds]) => ({ wishId, userIds }))
-      .sort((a, b) => b.userIds.length - a.userIds.length)
-      .slice(0, 5);
-
-    // Fetch wishes and users
-    const wishesSnapshot = await getDocs(collection(db, "wishes"));
-    const usersSnapshot = await getDocs(collection(db, "users"));
-
-    const usersMap: { [id: string]: User } = {};
-    usersSnapshot.forEach((doc) => {
-      usersMap[doc.id] = { id: doc.id, ...(doc.data() as User) };
-    });
-
-    const wishesMap: { [id: string]: Wish } = {};
-    wishesSnapshot.forEach((doc) => {
-        wishesMap[doc.id] = { ...(doc.data() as Wish), id: doc.id } as Wish & { id: string };
+        if (!wishId || !userId) return;
+        if (!likesMap[wishId]) likesMap[wishId] = [];
+        likesMap[wishId].push(userId);
       });
 
-    // Build result array
-    const result: WishWithMeta[] = topLikes.map((like) => {
-      const wish = wishesMap[like.wishId];
-      if (!wish) return null;
-      const userId =
-        wish.userId && typeof wish.userId === "object" && "id" in wish.userId
-          ? (wish.userId as { id: string }).id
-          : wish.userId;
-      const userRef = doc(db, "users", userId);
-      const user = usersMap[userId] || null;
-      const likeCount = like.userIds.length;
-      const isLiked = currentUserId ? like.userIds.includes(currentUserId) : false;
+      // 2. Sort & pick top 2
+      const topLikes = Object.entries(likesMap)
+        .map(([wishId, userIds]) => ({ wishId, userIds }))
+        .sort((a, b) => b.userIds.length - a.userIds.length)
+        .slice(0, 5);
 
-      return {
-        ...wish,
-        id: like.wishId,
-        userRef,
-        user,
-        likeCount,
-        isLiked,
-      };
-    }).filter(Boolean) as WishWithMeta[];
+      // 3. Resolve each wish + user from Firestore directly
+      const result = await Promise.all(
+        topLikes.map(async (like) => {
+          const wishRef = doc(db, "wishes", like.wishId);
+          const wishSnap = await getDoc(wishRef);
 
-    return result;
-  } catch (error) {
-    console.error("Error fetching top five wishes by likes:", error);
-    throw new Error("Failed to fetch top five wishes by likes");
-  }
-},
+          if (!wishSnap.exists()) return null;
+          const wishData = wishSnap.data() as Wish & { userId: any };
+
+          // Resolve user reference
+          const userId =
+            wishData.userId &&
+            typeof wishData.userId === "object" &&
+            "id" in wishData.userId
+              ? wishData.userId.id
+              : wishData.userId;
+
+          const userRef = doc(db, "users", userId);
+          const userSnap = await getDoc(userRef);
+
+          let userData: {
+            id: string;
+            firstName?: string;
+            lastName?: string;
+            country?: string;
+          } | null = null;
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            userData = {
+              id: userSnap.id,
+              firstName: data.firstName ,
+              lastName: data.lastName ,
+              country: data.country,
+            };
+          }
+
+          const likeCount = like.userIds.length;
+          const isLiked = currentUserId
+            ? like.userIds.includes(currentUserId)
+            : false;
+
+          return {
+            ...wishData,
+            id: wishSnap.id,
+            userId,
+            user: userData, 
+            likeCount,
+            isLiked,
+          } as WishWithMeta;
+        })
+      );
+
+      return result.filter((wish): wish is WishWithMeta => wish !== null);
+    } catch (error) {
+      console.error("Error fetching top two wishes by likes:", error);
+      throw new Error("Failed to fetch top two wishes by likes");
+    }
+  },
 };
