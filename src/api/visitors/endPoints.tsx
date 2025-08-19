@@ -110,7 +110,12 @@ export const visitorService = {
     }
   },
 
-  async getMonthlyVisitors() {
+  async getMonthlyVisitors(): Promise<
+    Array<{
+      month: string;
+      count: number;
+    }>
+  > {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { month: string; count: number }[] = [];
@@ -151,7 +156,12 @@ export const visitorService = {
     }
   },
 
-  async getWeeklyVisitors() {
+  async getWeeklyVisitors(): Promise<
+    Array<{
+      week: string;
+      count: number;
+    }>
+  > {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { week: string; count: number }[] = [];
@@ -202,25 +212,23 @@ export const visitorService = {
     }
   },
 
-  async getYearlyDailyVisitors() {
+  async getLast10DaysVisitors() {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { day: string; count: number }[] = [];
 
       const today = new Date();
-      const year = today.getFullYear();
-      const isCurrentYear = today.getFullYear() === year;
+      today.setHours(0, 0, 0, 0);
 
-      // Start from 1 Jan of given year
-      let start = new Date(year, 0, 1);
-      start.setHours(0, 0, 0, 0);
+      // 10 days back (including today)
+      const start = new Date(today);
+      start.setDate(start.getDate() - 9); // last 10 days = today + 9 previous
 
-      // Last day of loop (agar current year hai to today, warna 31 Dec)
-      const endDate = isCurrentYear ? today : new Date(year, 11, 31);
+      let current = new Date(start);
 
-      while (start <= endDate) {
-        const dayStart = new Date(start);
-        const nextDay = new Date(start);
+      while (current <= today) {
+        const dayStart = new Date(current);
+        const nextDay = new Date(current);
         nextDay.setDate(nextDay.getDate() + 1);
 
         const dayQuery = query(
@@ -232,18 +240,17 @@ export const visitorService = {
         const snap = await getDocs(dayQuery);
 
         results.push({
-          day: dayStart.toLocaleDateString("en-GB"), // e.g. "01/01/2025"
+          day: dayStart.toLocaleDateString("en-GB"), // "dd/mm/yyyy"
           count: snap.size,
         });
 
-        // Next day
-        start = nextDay;
+        current = nextDay;
       }
 
       return results;
     } catch (error) {
-      console.error("Error fetching yearly daily visitors:", error);
-      throw new Error("Failed to fetch yearly daily visitors");
+      console.error("Error fetching last 10 days page views:", error);
+      throw new Error("Failed to fetch last 10 days page views");
     }
   },
 };

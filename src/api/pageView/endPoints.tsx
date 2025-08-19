@@ -148,12 +148,18 @@ export const pageViewService = {
     }
   },
 
-  async getMonthlyPageView(year: number) {
+  async getMonthlyPageView(): Promise<
+    Array<{
+      month: string;
+      count: number;
+    }>
+  > {
     try {
       const coll = collection(db, "pageViews");
       const results: { month: string; count: number }[] = [];
 
       const today = new Date();
+      const year = today.getFullYear();
       const currentMonth = today.getMonth(); // 0 = Jan, 11 = Dec
 
       for (
@@ -176,7 +182,7 @@ export const pageViewService = {
         const snap = await getDocs(monthQuery);
 
         results.push({
-          month: monthStart.toLocaleString("default", { month: "short" }), 
+          month: monthStart.toLocaleString("default", { month: "short" }),
           count: snap.size,
         });
       }
@@ -188,16 +194,16 @@ export const pageViewService = {
     }
   },
 
-  async getWeeklyPageViews(year: number) {
+  async getWeeklyPageViews(): Promise<Array<{ week: string; count: number }>> {
     try {
       const coll = collection(db, "pageViews");
       const results: { week: string; count: number }[] = [];
 
-      // Start from 1st Jan of given year
-      let start = new Date(year, 0, 1);
-      start.setHours(0, 0, 0, 0);
-
       const today = new Date();
+      const year = today.getFullYear();
+
+      let start = new Date(year, 0, 1); // Jan 1
+      start.setHours(0, 0, 0, 0);
 
       let weekNumber = 1;
       while (start <= today && start.getFullYear() === year) {
@@ -205,10 +211,10 @@ export const pageViewService = {
         const weekEnd = new Date(start);
         weekEnd.setDate(weekEnd.getDate() + 6);
 
-        // If weekEnd goes beyond today, cap it at today
-        const effectiveEnd = weekEnd > today ? today : weekEnd;
+        // include full last day
+        const effectiveEnd = new Date(weekEnd > today ? today : weekEnd);
+        effectiveEnd.setDate(effectiveEnd.getDate() + 1);
 
-        // Firestore query with Timestamp
         const weekQuery = query(
           coll,
           where("createdAt", ">=", Timestamp.fromDate(weekStart)),
@@ -220,14 +226,12 @@ export const pageViewService = {
         results.push({
           week: `W${weekNumber} (${weekStart.toLocaleDateString(
             "en-GB"
-          )} - ${effectiveEnd.toLocaleDateString("en-GB")})`,
+          )} - ${weekEnd.toLocaleDateString("en-GB")})`,
           count: snap.size,
         });
 
-        // Stop if this week included today
         if (weekEnd >= today) break;
 
-        // Move to next week
         start.setDate(start.getDate() + 7);
         weekNumber++;
       }
@@ -238,25 +242,24 @@ export const pageViewService = {
       throw new Error("Failed to fetch weekly page views");
     }
   },
-
-  async getYearlyDailyPageViews(year: number) {
+  
+  async getLast10DaysPageViews() {
     try {
       const coll = collection(db, "pageViews");
       const results: { day: string; count: number }[] = [];
 
       const today = new Date();
-      const isCurrentYear = today.getFullYear() === year;
+      today.setHours(0, 0, 0, 0);
 
-      // Start from 1 Jan of given year
-      let start = new Date(year, 0, 1);
-      start.setHours(0, 0, 0, 0);
+      // 10 days back (including today)
+      const start = new Date(today);
+      start.setDate(start.getDate() - 9); // last 10 days = today + 9 previous
 
-      // Last day of loop (agar current year hai to today, warna 31 Dec)
-      const endDate = isCurrentYear ? today : new Date(year, 11, 31);
+      let current = new Date(start);
 
-      while (start <= endDate) {
-        const dayStart = new Date(start);
-        const nextDay = new Date(start);
+      while (current <= today) {
+        const dayStart = new Date(current);
+        const nextDay = new Date(current);
         nextDay.setDate(nextDay.getDate() + 1);
 
         const dayQuery = query(
@@ -268,18 +271,17 @@ export const pageViewService = {
         const snap = await getDocs(dayQuery);
 
         results.push({
-          day: dayStart.toLocaleDateString("en-GB"), // e.g. "01/01/2025"
+          day: dayStart.toLocaleDateString("en-GB"), // "dd/mm/yyyy"
           count: snap.size,
         });
 
-        // Next day
-        start = nextDay;
+        current = nextDay;
       }
 
       return results;
     } catch (error) {
-      console.error("Error fetching yearly daily page views:", error);
-      throw new Error("Failed to fetch yearly daily page views");
+      console.error("Error fetching last 10 days page views:", error);
+      throw new Error("Failed to fetch last 10 days page views");
     }
   },
 };
