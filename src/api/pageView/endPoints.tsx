@@ -11,45 +11,45 @@ import {
 import { db } from "../../firebase-config";
 import type { PageView } from "../../types/pageView";
 
-function startOfDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-function startOfWeek(date: Date) {
-  const d = new Date(date);
-  const day = d.getDay(); // Sunday=0
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday start
-  return new Date(d.setDate(diff));
-}
-function startOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
+// function startOfDay(date: Date) {
+//   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+// }
+// function startOfWeek(date: Date) {
+//   const d = new Date(date);
+//   const day = d.getDay(); // Sunday=0
+//   const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday start
+//   return new Date(d.setDate(diff));
+// }
+// function startOfMonth(date: Date) {
+//   return new Date(date.getFullYear(), date.getMonth(), 1);
+// }
 
-async function getPageViewsCount(start: Date, end: Date) {
-  const q = query(
-    collection(db, "pageViews"),
-    where("createdAt", ">=", Timestamp.fromDate(start)),
-    where("createdAt", "<", Timestamp.fromDate(end))
-  );
-  const snap = await getDocs(q);
-  return snap.size;
-}
+// async function getPageViewsCount(start: Date, end: Date) {
+//   const q = query(
+//     collection(db, "pageViews"),
+//     where("createdAt", ">=", Timestamp.fromDate(start)),
+//     where("createdAt", "<", Timestamp.fromDate(end))
+//   );
+//   const snap = await getDocs(q);
+//   return snap.size;
+// }
 
-async function getTotalPageViews() {
-  const snap = await getDocs(collection(db, "pageViews"));
-  return snap.size;
-}
+// async function getTotalPageViews() {
+//   const snap = await getDocs(collection(db, "pageViews"));
+//   return snap.size;
+// }
 
-function calcGrowth(X: number, Y: number) {
-  if (X === 0 && Y > 0) return 100;
-  if (X === 0 && Y === 0) return 0;
-  return ((Y - X) / X) * 100;
-}
+// function calcGrowth(X: number, Y: number) {
+//   if (X === 0 && Y > 0) return 100;
+//   if (X === 0 && Y === 0) return 0;
+//   return ((Y - X) / X) * 100;
+// }
 
-function getTrend(growth: number) {
-  if (growth > 0) return "up";
-  if (growth < 0) return "down";
-  return "no-change";
-}
+// function getTrend(growth: number) {
+//   if (growth > 0) return "up";
+//   if (growth < 0) return "down";
+//   return "no-change";
+// }
 
 export const pageViewService = {
   // Record a visit for a specific page
@@ -68,70 +68,87 @@ export const pageViewService = {
     }
   },
 
-  // Daily growth (yesterday vs today)
-  async getDailyGrowth() {
-    const today = startOfDay(new Date());
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
+  async getUniquePageViewersCount(period: "daily" | "weekly" | "monthly") {
+    try {
+      const coll = collection(db, "pageViews");
 
-    const todayCount = await getPageViewsCount(today, new Date());
-    const yesterdayCount = await getPageViewsCount(yesterday, today);
-    const totalCount = await getTotalPageViews();
+      const now = new Date();
 
-    const growth = calcGrowth(yesterdayCount, todayCount);
+      let currentStart: Date, previousStart: Date, previousEnd: Date;
 
-    return {
-      yesterday: yesterdayCount,
-      today: todayCount,
-      growth,
-      trend: getTrend(growth),
-      total: totalCount,
-    };
+      if (period === "daily") {
+        // Today
+        currentStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate()
+        );
+        // Yesterday
+        previousStart = new Date(currentStart);
+        previousStart.setDate(previousStart.getDate() - 1);
+        previousEnd = new Date(currentStart);
+      } else if (period === "weekly") {
+        // This week (start from Monday)
+        const day = now.getDay(); // 0 = Sun, 1 = Mon
+        const diff = day === 0 ? 6 : day - 1;
+        currentStart = new Date(now);
+        currentStart.setDate(currentStart.getDate() - diff);
+        currentStart.setHours(0, 0, 0, 0);
+
+        // Last week
+        previousEnd = new Date(currentStart);
+        previousStart = new Date(previousEnd);
+        previousStart.setDate(previousStart.getDate() - 7);
+      } else {
+        // This month
+        currentStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        // Last month
+        previousStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        previousEnd = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+
+      // Queries
+      const currentQuery = query(
+        coll,
+        where("createdAt", ">=", Timestamp.fromDate(currentStart))
+      );
+      const previousQuery = query(
+        coll,
+        where("createdAt", ">=", Timestamp.fromDate(previousStart)),
+        where("createdAt", "<", Timestamp.fromDate(previousEnd))
+      );
+
+      const [currentSnap, previousSnap] = await Promise.all([
+        getDocs(currentQuery),
+        getDocs(previousQuery),
+      ]);
+
+      const currentCount = currentSnap.size;
+      const previousCount = previousSnap.size;
+
+      // % change
+      let percentageChange = 0;
+      if (previousCount > 0) {
+        percentageChange =
+          ((currentCount - previousCount) / previousCount) * 100;
+      } else if (currentCount > 0) {
+        percentageChange = 100;
+      }
+
+      return {
+        period,
+        previous: previousCount, // X
+        current: currentCount, // Y
+        percentageChange: Math.round(percentageChange * 100) / 100, // 2 decimals
+      };
+    } catch (error) {
+      console.error("Error fetching page views count:", error);
+      throw new Error("Failed to fetch page views count");
+    }
   },
 
-  // Weekly growth (last week vs this week)
-  async getWeeklyGrowth() {
-    const thisWeek = startOfWeek(new Date());
-    const lastWeek = new Date(thisWeek);
-    lastWeek.setDate(thisWeek.getDate() - 7);
-
-    const thisWeekCount = await getPageViewsCount(thisWeek, new Date());
-    const lastWeekCount = await getPageViewsCount(lastWeek, thisWeek);
-    const totalCount = await getTotalPageViews();
-
-    const growth = calcGrowth(lastWeekCount, thisWeekCount);
-
-    return {
-      lastWeek: lastWeekCount,
-      thisWeek: thisWeekCount,
-      growth,
-      trend: getTrend(growth),
-      total: totalCount,
-    };
-  },
-
-  // Monthly growth (last month vs this month)
-  async getMonthlyGrowth() {
-    const thisMonth = startOfMonth(new Date());
-    const lastMonth = new Date(thisMonth);
-    lastMonth.setMonth(thisMonth.getMonth() - 1);
-
-    const thisMonthCount = await getPageViewsCount(thisMonth, new Date());
-    const lastMonthCount = await getPageViewsCount(lastMonth, thisMonth);
-    const totalCount = await getTotalPageViews();
-
-    const growth = calcGrowth(lastMonthCount, thisMonthCount);
-
-    return {
-      lastMonth: lastMonthCount,
-      thisMonth: thisMonthCount,
-      growth,
-      trend: getTrend(growth),
-      total: totalCount,
-    };
-  },
-
-    async getMonthlyPageView(year: number) {
+  async getMonthlyPageView(year: number) {
     try {
       const coll = collection(db, "pageViews");
       const results: { month: string; count: number }[] = [];
@@ -159,7 +176,7 @@ export const pageViewService = {
         const snap = await getDocs(monthQuery);
 
         results.push({
-          month: monthStart.toLocaleString("default", { month: "short" }), // "Jan", "Feb"
+          month: monthStart.toLocaleString("default", { month: "short" }), 
           count: snap.size,
         });
       }
@@ -171,7 +188,7 @@ export const pageViewService = {
     }
   },
 
-   async getWeeklyPageViews(year: number) {
+  async getWeeklyPageViews(year: number) {
     try {
       const coll = collection(db, "pageViews");
       const results: { week: string; count: number }[] = [];
@@ -186,7 +203,7 @@ export const pageViewService = {
       while (start <= today && start.getFullYear() === year) {
         const weekStart = new Date(start);
         const weekEnd = new Date(start);
-        weekEnd.setDate(weekEnd.getDate() + 7);
+        weekEnd.setDate(weekEnd.getDate() + 6);
 
         // If weekEnd goes beyond today, cap it at today
         const effectiveEnd = weekEnd > today ? today : weekEnd;
@@ -208,17 +225,17 @@ export const pageViewService = {
         });
 
         // Stop if this week included today
-        if (weekEnd > today) break;
+        if (weekEnd >= today) break;
 
         // Move to next week
-        start = weekEnd;
+        start.setDate(start.getDate() + 7);
         weekNumber++;
       }
 
       return results;
     } catch (error) {
-      console.error("Error fetching weekly visitors:", error);
-      throw new Error("Failed to fetch weekly visitors");
+      console.error("Error fetching weekly page views:", error);
+      throw new Error("Failed to fetch weekly page views");
     }
   },
 
@@ -261,8 +278,8 @@ export const pageViewService = {
 
       return results;
     } catch (error) {
-      console.error("Error fetching yearly daily visitors:", error);
-      throw new Error("Failed to fetch yearly daily visitors");
+      console.error("Error fetching yearly daily page views:", error);
+      throw new Error("Failed to fetch yearly daily page views");
     }
   },
 };

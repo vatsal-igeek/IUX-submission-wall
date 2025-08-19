@@ -110,12 +110,13 @@ export const visitorService = {
     }
   },
 
-  async getMonthlyVisitors(year: number) {
+  async getMonthlyVisitors() {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { month: string; count: number }[] = [];
 
       const today = new Date();
+      const year = today.getFullYear();
       const currentMonth = today.getMonth(); // 0 = Jan, 11 = Dec
 
       for (
@@ -150,22 +151,22 @@ export const visitorService = {
     }
   },
 
-  async getWeeklyVisitors(year: number) {
+  async getWeeklyVisitors() {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { week: string; count: number }[] = [];
 
       // Start from 1st Jan of given year
+      const today = new Date();
+      const year = today.getFullYear();
       let start = new Date(year, 0, 1);
       start.setHours(0, 0, 0, 0);
-
-      const today = new Date();
 
       let weekNumber = 1;
       while (start <= today && start.getFullYear() === year) {
         const weekStart = new Date(start);
         const weekEnd = new Date(start);
-        weekEnd.setDate(weekEnd.getDate() + 7);
+        weekEnd.setDate(weekEnd.getDate() + 6);
 
         // If weekEnd goes beyond today, cap it at today
         const effectiveEnd = weekEnd > today ? today : weekEnd;
@@ -187,10 +188,10 @@ export const visitorService = {
         });
 
         // Stop if this week included today
-        if (weekEnd > today) break;
+        if (weekEnd >= today) break;
 
         // Move to next week
-        start = weekEnd;
+        start.setDate(start.getDate() + 7);
         weekNumber++;
       }
 
@@ -201,12 +202,13 @@ export const visitorService = {
     }
   },
 
-  async getYearlyDailyVisitors(year: number) {
+  async getYearlyDailyVisitors() {
     try {
       const coll = collection(db, "uniquevisitors");
       const results: { day: string; count: number }[] = [];
 
       const today = new Date();
+      const year = today.getFullYear();
       const isCurrentYear = today.getFullYear() === year;
 
       // Start from 1 Jan of given year
