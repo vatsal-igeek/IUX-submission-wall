@@ -9,6 +9,8 @@ import {
   serverTimestamp,
   DocumentReference,
   getDoc,
+  DocumentSnapshot,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import type { Wish } from "../../types/wishesh";
@@ -49,8 +51,9 @@ export const wishService = {
 
   async getAllWishes(
     pageLimit: number = 10,
-    currentUserId?: string
-  ): Promise<WishWithMeta[]> {
+    currentUserId?: string,
+    lastWishDoc?: DocumentSnapshot | null
+  ): Promise<{ wishes: WishWithMeta[]; lastDoc: DocumentSnapshot | null }> {
     try {
       let wishesQuery = query(
         collection(db, "wishes"),
@@ -58,7 +61,25 @@ export const wishService = {
         limit(pageLimit)
       );
 
+      // Add pagination cursor if provided
+      if (lastWishDoc) {
+        wishesQuery = query(
+          collection(db, "wishes"),
+          orderBy("createdAt", "desc"),
+          startAfter(lastWishDoc),
+          limit(pageLimit)
+        );
+      }
+
       const wishesSnapshot = await getDocs(wishesQuery);
+
+      // If no documents, return empty result
+      if (wishesSnapshot.empty) {
+        return { wishes: [], lastDoc: null };
+      }
+
+      // Get the last document for next pagination
+      const lastDoc = wishesSnapshot.docs[wishesSnapshot.docs.length - 1];
 
       // Fetch all likes once
       const likesSnapshot = await getDocs(collection(db, "wishLikes"));
@@ -123,7 +144,6 @@ export const wishService = {
             ...wish,
             id: docSnap.id,
             userId,
-            // userRef,
             user: userData,
             likeCount: likedByArr.length,
             isLiked,
@@ -131,7 +151,7 @@ export const wishService = {
         })
       );
 
-      return wishesWithUsers;
+      return { wishes: wishesWithUsers, lastDoc };
     } catch (error) {
       console.error("Error fetching wishes:", error);
       throw new Error("Failed to fetch wishes");
@@ -270,8 +290,8 @@ export const wishService = {
             const data = userSnap.data();
             userData = {
               id: userSnap.id,
-              firstName: data.firstName ,
-              lastName: data.lastName ,
+              firstName: data.firstName,
+              lastName: data.lastName,
               country: data.country,
             };
           }
@@ -302,7 +322,7 @@ export const wishService = {
   async getTopFiveWishesByLikes(
     currentUserId: string
   ): Promise<WishWithMeta[]> {
-   try {
+    try {
       // 1. Collect likes
       const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
       const likesMap: { [wishId: string]: string[] } = {};
@@ -359,8 +379,8 @@ export const wishService = {
             const data = userSnap.data();
             userData = {
               id: userSnap.id,
-              firstName: data.firstName ,
-              lastName: data.lastName ,
+              firstName: data.firstName,
+              lastName: data.lastName,
               country: data.country,
             };
           }
@@ -374,7 +394,7 @@ export const wishService = {
             ...wishData,
             id: wishSnap.id,
             userId,
-            user: userData, 
+            user: userData,
             likeCount,
             isLiked,
           } as WishWithMeta;
