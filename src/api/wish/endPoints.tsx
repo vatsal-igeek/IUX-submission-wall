@@ -11,6 +11,7 @@ import {
   getDoc,
   DocumentSnapshot,
   startAfter,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import type { Wish } from "../../types/wishesh";
@@ -405,6 +406,122 @@ export const wishService = {
     } catch (error) {
       console.error("Error fetching top two wishes by likes:", error);
       throw new Error("Failed to fetch top two wishes by likes");
+    }
+  },
+
+  subscribeToWishes(
+    pageLimit: number = 10,
+    currentUserId?: string,
+    lastWishDoc?: DocumentSnapshot | null,
+    callback?: (result: {
+      wishes: WishWithMeta[];
+      lastDoc: DocumentSnapshot | null;
+    }) => void
+  ) {
+    try {
+      let wishesQuery = query(
+        collection(db, "wishes"),
+        orderBy("createdAt", "desc"),
+        limit(pageLimit)
+      );
+
+      if (lastWishDoc) {
+        wishesQuery = query(
+          collection(db, "wishes"),
+          orderBy("createdAt", "desc"),
+          startAfter(lastWishDoc),
+          limit(pageLimit)
+        );
+      }
+
+      const unsubscribe = onSnapshot(wishesQuery, async (wishesSnapshot) => {
+        if (wishesSnapshot.empty) {
+          callback?.({ wishes: [], lastDoc: null });
+          return;
+        }
+
+        // Get the last document for pagination
+        const lastDoc = wishesSnapshot.docs[wishesSnapshot.docs.length - 1];
+
+        // Fetch likes in realtime (all likes)
+        const likesSnapshot = await getDocs(collection(db, "wishLikes"));
+        const likesMap: Record<string, string[]> = {};
+
+        likesSnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          let wishId: string | null = null;
+          let userId: string | null = null;
+
+          if (data.wishId instanceof DocumentReference) {
+            wishId = data.wishId.id;
+          } else if (typeof data.wishId === "string") {
+            wishId = data.wishId;
+          }
+
+          if (data.userId instanceof DocumentReference) {
+            userId = data.userId.id;
+          } else if (typeof data.userId === "string") {
+            userId = data.userId;
+          }
+
+          if (!wishId || !userId) return;
+          if (!likesMap[wishId]) likesMap[wishId] = [];
+          likesMap[wishId].push(userId);
+        });
+
+        // Enrich wishes with user data + likes
+        const wishesWithUsers: WishWithMeta[] = await Promise.all(
+          wishesSnapshot.docs.map(async (docSnap) => {
+            const wish = docSnap.data() as Wish;
+            const userId =
+              wish.userId &&
+              typeof wish.userId === "object" &&
+              "id" in wish.userId
+                ? (wish.userId as { id: string }).id
+                : wish.userId;
+
+            let userData: {
+              firstName: string;
+              lastName: string;
+              country: string;
+            } | null = null;
+
+            if (userId) {
+              const userRef = doc(db, "users", userId);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                const data = userSnap.data() as User;
+                userData = {
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  country: data.country,
+                };
+              }
+            }
+
+            const likedByArr = likesMap[docSnap.id] || [];
+            const isLiked = currentUserId
+              ? likedByArr.includes(currentUserId)
+              : false;
+
+            return {
+              ...wish,
+              id: docSnap.id,
+              userId,
+              user: userData,
+              likeCount: likedByArr.length,
+              isLiked,
+            };
+          })
+        );
+
+        callback?.({ wishes: wishesWithUsers, lastDoc });
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.error("Error in subscribeToWishes:", error);
+      throw new Error("Failed to subscribe to wishes");
     }
   },
 };

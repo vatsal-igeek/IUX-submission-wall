@@ -243,7 +243,7 @@ export const pageViewService = {
     }
   },
   
-  async getLast10DaysPageViews() {
+  async getLast15DaysPageViews() {
     try {
       const coll = collection(db, "pageViews");
       const results: { day: string; count: number }[] = [];
@@ -253,7 +253,7 @@ export const pageViewService = {
 
       // 10 days back (including today)
       const start = new Date(today);
-      start.setDate(start.getDate() - 9); // last 10 days = today + 9 previous
+      start.setDate(start.getDate() - 14); // last 10 days = today + 9 previous
 
       let current = new Date(start);
 
@@ -280,8 +280,8 @@ export const pageViewService = {
 
       return results;
     } catch (error) {
-      console.error("Error fetching last 10 days page views:", error);
-      throw new Error("Failed to fetch last 10 days page views");
+      console.error("Error fetching last 15 days page views:", error);
+      throw new Error("Failed to fetch last 15 days page views");
     }
   },
 };

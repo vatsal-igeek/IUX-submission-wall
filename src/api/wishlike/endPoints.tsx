@@ -128,7 +128,7 @@ export const wishLikeService = {
 
   async getAllMonthlyStats(): Promise<
     Array<{
-      month: string; 
+      month: string;
       wishCount: number;
       likeCount: number;
     }>
@@ -258,88 +258,58 @@ export const wishLikeService = {
     }
   },
 
-  async getYearlyDailyStats(): Promise<
-    Array<{
-      day: number;
-      month: number;
-      year: number;
-      wishCount: number;
-      likeCount: number;
-    }>
+  async getLast15DaysStats(): Promise<
+    Array<{ day: string; wishCount: number; likeCount: number }>
   > {
     try {
-      const currentYear = new Date().getFullYear();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-      const wishesSnapshot = await getDocs(collection(db, "wishes"));
-      const wishDayMap: Record<
-        string,
-        { day: number; month: number; year: number; wishCount: number }
-      > = {};
+      const start = new Date(today);
+      start.setDate(start.getDate() - 14); // today + last 14 days = 15 total
 
-      wishesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const createdAt = data.createdAt?.toDate
-          ? data.createdAt.toDate()
-          : new Date(data.createdAt);
-        if (!createdAt || isNaN(createdAt.getTime())) return;
-        if (createdAt.getFullYear() !== currentYear) return; // only current year
+      const results: Array<{
+        day: string;
+        wishCount: number;
+        likeCount: number;
+      }> = [];
 
-        const day = createdAt.getDate();
-        const month = createdAt.getMonth() + 1;
-        const year = createdAt.getFullYear();
-        const key = `${year}-${month}-${day}`;
-        if (!wishDayMap[key]) {
-          wishDayMap[key] = { day, month, year, wishCount: 0 };
-        }
-        wishDayMap[key].wishCount++;
-      });
+      let current = new Date(start);
 
-      // Likes
-      const likesSnapshot = await getDocs(collection(db, "wishLikes"));
-      const likeDayMap: Record<
-        string,
-        { day: number; month: number; year: number; likeCount: number }
-      > = {};
+      while (current <= today) {
+        const dayStart = new Date(current);
+        const nextDay = new Date(current);
+        nextDay.setDate(nextDay.getDate() + 1);
 
-      likesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const createdAt = data.createdAt?.toDate
-          ? data.createdAt.toDate()
-          : new Date(data.createdAt);
-        if (!createdAt || isNaN(createdAt.getTime())) return;
-        if (createdAt.getFullYear() !== currentYear) return;
+        // Wishes
+        const wishesQuery = query(
+          collection(db, "wishes"),
+          where("createdAt", ">=", Timestamp.fromDate(dayStart)),
+          where("createdAt", "<", Timestamp.fromDate(nextDay))
+        );
+        const wishesSnap = await getDocs(wishesQuery);
 
-        const day = createdAt.getDate();
-        const month = createdAt.getMonth() + 1;
-        const year = createdAt.getFullYear();
-        const key = `${year}-${month}-${day}`;
-        if (!likeDayMap[key]) {
-          likeDayMap[key] = { day, month, year, likeCount: 0 };
-        }
-        likeDayMap[key].likeCount++;
-      });
+        // Likes
+        const likesQuery = query(
+          collection(db, "wishLikes"),
+          where("createdAt", ">=", Timestamp.fromDate(dayStart)),
+          where("createdAt", "<", Timestamp.fromDate(nextDay))
+        );
+        const likesSnap = await getDocs(likesQuery);
 
-      const allKeys = Array.from(
-        new Set([...Object.keys(wishDayMap), ...Object.keys(likeDayMap)])
-      );
+        results.push({
+          day: dayStart.toLocaleDateString("en-GB"), // dd/mm/yyyy
+          wishCount: wishesSnap.size,
+          likeCount: likesSnap.size,
+        });
 
-      const result = allKeys.map((key) => ({
-        day: wishDayMap[key]?.day || likeDayMap[key]?.day,
-        month: wishDayMap[key]?.month || likeDayMap[key]?.month,
-        year: wishDayMap[key]?.year || likeDayMap[key]?.year,
-        wishCount: wishDayMap[key]?.wishCount || 0,
-        likeCount: likeDayMap[key]?.likeCount || 0,
-      }));
+        current = nextDay;
+      }
 
-      // Sort by year, month, day
-      result.sort(
-        (a, b) => a.year - b.year || a.month - b.month || a.day - b.day
-      );
-
-      return result;
+      return results;
     } catch (error) {
-      console.error("Error fetching yearly daily stats:", error);
-      throw new Error("Failed to fetch yearly daily stats");
+      console.error("Error fetching last 15 days stats:", error);
+      throw new Error("Failed to fetch last 15 days stats");
     }
   },
 };
