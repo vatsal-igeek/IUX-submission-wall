@@ -4,14 +4,12 @@ import { FillHeartSvg, HeartSvg } from "../../icons";
 import { wishService } from "../../api/wish/endPoints";
 import SkeletonCard from "./SkeletonCard";
 import { cn } from "../../utils/cn";
-import { wishLikeService } from "../../api/wishlike/endPoints";
 import { getCookie } from "../../utils";
-import toast from "react-hot-toast";
 import formatTimestamp from "../../utils/formatTimestamp";
+import { useOptimisticWishes } from "../../hooks/useOptimisticWishes";
+import type { Wish } from "../../types/wishesh";
 
 const WishesCards = () => {
-  // Sample data for wish cards
-  const [wishes, setWishes] = useState<Wish[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -20,86 +18,108 @@ const WishesCards = () => {
 
   const ITEMS_PER_PAGE = 10;
 
-  const fetchWishes = useCallback(
-    async (isLoadMore = false) => {
-      try {
-        if (!currentUserId) return;
+  // Use the optimistic wishes hook
+  const { wishes, setWishes, toggleLikeOptimistic } = useOptimisticWishes(
+    currentUserId || ""
+  );
 
-        if (!isLoadMore) {
-          setLoading(true);
-          setLastDoc(null); // Reset cursor for fresh load
-        } else {
-          setLoadingMore(true);
-        }
+  // Keep track of unsubscribe functions for cleanup
+  const unsubscribersRef = useRef<(() => void)[]>([]);
 
-        const result = await wishService.getAllWishes(
-          ITEMS_PER_PAGE,
-          currentUserId,
-          isLoadMore ? lastDoc : null
-        );
+  // Subscribe to the first page of wishes in realtime
+  useEffect(() => {
+    if (!currentUserId) return;
 
-        // Map WishWithMeta[] to Wish[]
-        const wishesWithUser: Wish[] = result.wishes.map((wish: any) => ({
+    setLoading(true);
+    setLastDoc(null);
+    setHasMore(true);
+
+    // cleanup old subscriptions
+    unsubscribersRef.current.forEach((unsub) => unsub());
+    unsubscribersRef.current = [];
+
+    const unsubscribe = wishService.subscribeToWishes(
+      ITEMS_PER_PAGE,
+      currentUserId,
+      null,
+      ({ wishes: newWishes, lastDoc: newLastDoc }) => {
+        const mapped: Wish[] = newWishes.map((wish: any) => ({
           ...wish,
           user: {
-            firstName: wish.user.firstName || "",
-            lastName: wish.user.lastName || "",
-            country: wish.user.country || "",
+            firstName: wish.user?.firstName || "",
+            lastName: wish.user?.lastName || "",
+            country: wish.user?.country || "",
           },
         }));
 
-        if (!isLoadMore) {
-          setWishes(wishesWithUser);
-        } else {
-          setWishes((prev) => [...prev, ...wishesWithUser]);
-        }
-
-        // Update cursor and check if we have more data
-        setLastDoc(result.lastDoc);
-        setHasMore(
-          wishesWithUser.length === ITEMS_PER_PAGE && result.lastDoc !== null
-        );
-
+        setWishes(mapped);
+        setLastDoc(newLastDoc);
+        setHasMore(mapped.length === ITEMS_PER_PAGE && newLastDoc !== null);
         setLoading(false);
-        setLoadingMore(false);
-      } catch (error) {
-        setLoading(false);
-        setLoadingMore(false);
-        console.error(error);
       }
-    },
-    [currentUserId, lastDoc]
-  );
+    );
 
+    unsubscribersRef.current.push(unsubscribe);
+
+    return () => {
+      unsubscribersRef.current.forEach((unsub) => unsub());
+      unsubscribersRef.current = [];
+    };
+  }, [currentUserId, setWishes]);
+
+  // Subscribe to load more wishes (pagination)
+  const loadMoreWishes = useCallback(() => {
+    if (!currentUserId || !hasMore || !lastDoc) return;
+
+    setLoadingMore(true);
+
+    const unsubscribe = wishService.subscribeToWishes(
+      ITEMS_PER_PAGE,
+      currentUserId,
+      lastDoc,
+      ({ wishes: newWishes, lastDoc: newLastDoc }) => {
+        const mapped: Wish[] = newWishes.map((wish: any) => ({
+          ...wish,
+          user: {
+            firstName: wish.user?.firstName || "",
+            lastName: wish.user?.lastName || "",
+            country: wish.user?.country || "",
+          },
+        }));
+
+        setWishes((prev) => [...prev, ...mapped]);
+        setLastDoc(newLastDoc);
+        setHasMore(mapped.length === ITEMS_PER_PAGE && newLastDoc !== null);
+        setLoadingMore(false);
+      }
+    );
+
+    unsubscribersRef.current.push(unsubscribe);
+  }, [currentUserId, hasMore, lastDoc, setWishes]);
+
+  // Intersection Observer for infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    // Reset state and fetch initial data
-    setLastDoc(null);
-    setHasMore(true);
-    fetchWishes(false);
-  }, [currentUserId]); // Only depend on currentUserId
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreWishes();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" }
+    );
 
+    const node = loadMoreRef.current;
+    if (node && hasMore && !loadingMore) observer.observe(node);
+
+    return () => {
+      if (node) observer.unobserve(node);
+    };
+  }, [hasMore, loadingMore, loadMoreWishes]);
+
+  // For card entry animations
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  const handleLikeToggle = async (wishId: string) => {
-    try {
-      if (!currentUserId) return;
-      await wishLikeService.toggleLike(wishId, currentUserId);
-      toast.success("wish Liked successfully");
-    } catch (error) {
-      toast.error("Failed to add or remove like");
-    }
-  };
-
-  const formatLikes = (likes: number) => {
-    if (likes >= 1000) {
-      return `${(likes / 1000).toFixed(1)}K`;
-    }
-    return likes.toString();
-  };
-
-  // Intersection Observer for card animations
   useEffect(() => {
     if (!wishes.length) return;
 
@@ -111,56 +131,22 @@ const WishesCards = () => {
             setVisibleCards((prev) => new Set([...prev, cardId]));
           } else {
             setVisibleCards((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(cardId);
-              return newSet;
+              const next = new Set(prev);
+              next.delete(cardId);
+              return next;
             });
           }
         });
       },
-      {
-        threshold: 0.5,
-        rootMargin: "10% 0px -25% 0px",
-      }
+      { threshold: 0.5, rootMargin: "10% 0px -25% 0px" }
     );
 
-    cardRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
+    cardRefs.current.forEach((ref) => ref && observer.observe(ref));
     return () => observer.disconnect();
   }, [wishes]);
 
-  // Intersection Observer for infinite scroll
-  const loadMoreCallback = useCallback(() => {
-    if (!hasMore || loadingMore) return;
-    fetchWishes(true);
-  }, [hasMore, loadingMore, fetchWishes]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMoreCallback();
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "100px",
-      }
-    );
-
-    const currentLoadMoreRef = loadMoreRef.current;
-    if (currentLoadMoreRef && hasMore && !loadingMore) {
-      observer.observe(currentLoadMoreRef);
-    }
-
-    return () => {
-      if (currentLoadMoreRef) {
-        observer.unobserve(currentLoadMoreRef);
-      }
-    };
-  }, [loadMoreCallback, hasMore, loadingMore]);
+  const formatLikes = (likes: number) =>
+    likes >= 1000 ? `${(likes / 1000).toFixed(1)}K` : likes.toString();
 
   const getCardAnimation = (index: number, cardId: string) => {
     const isVisible = visibleCards.has(cardId);
@@ -171,14 +157,12 @@ const WishesCards = () => {
         ? "translate-x-[-100px] opacity-0 rotate-[-15deg] scale-95"
         : "translate-x-[100px] opacity-0 rotate-[15deg] scale-95";
     }
-
     return "translate-x-0 opacity-100 rotate-0 scale-100";
   };
 
   return (
     <div className="py-[2.5rem] md:py-[3.75rem] lg:py-[6.25rem] min-h-screen overflow-x-hidden md:overflow-x-visible">
       <div className="container mx-auto w-full max-w-5xl px-4 md:px-28 lg:px-[1.875rem] xl:px-0">
-        {/* Section Title */}
         <h2 className="mb-[2.5rem] md:mb-[3.75rem] text-[2.5rem] md:text-[3.75rem] lg:text-[4rem] font-extrabold text-center">
           Wishes
         </h2>
@@ -187,7 +171,7 @@ const WishesCards = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-7xl mx-auto">
           {loading && wishes.length === 0
             ? [...Array(6)].map((_, i) => <SkeletonCard key={i} />)
-            : wishes?.map((wish, index) => (
+            : wishes.map((wish, index) => (
                 <div
                   key={wish.id}
                   ref={(el) => {
@@ -195,22 +179,30 @@ const WishesCards = () => {
                   }}
                   data-card-id={wish.id}
                   className={cn(
-                    `bg-inputBg rounded-2xl p-6 shadow-lg transition-all duration-700 ease-out transform`,
-                    getCardAnimation(index, wish.id)
+                    "bg-inputBg rounded-2xl p-6 shadow-lg transition-all duration-700 ease-out transform flex flex-col justify-between h-full",
+                    getCardAnimation(index, wish.id),
+                    wish.isOptimistic && "opacity-70 ring-2 ring-primary-main"
                   )}
                 >
-                  {/* Header Section */}
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl md:text-[2rem] font-bold text-cardCreator">
-                      {wish.user.firstName} {wish.user.lastName}
+                      {wish.user?.firstName} {wish.user?.lastName}
+                      {wish.isOptimistic && (
+                        <span className="ml-2 text-sm text-primary-main opacity-70">
+                          (Saving...)
+                        </span>
+                      )}
                     </h3>
                     <div className="flex items-center gap-2">
                       <span className="text-lg md:text-xl">
                         {formatLikes(wish.likeCount)}
                       </span>
                       <div
-                        onClick={() => handleLikeToggle(wish.id)}
-                        className="cursor-pointer transition-transform duration-200 hover:scale-110"
+                        onClick={() => toggleLikeOptimistic(wish.id)}
+                        className={cn(
+                          "cursor-pointer transition-transform duration-200 hover:scale-110",
+                          wish.isOptimistic && "pointer-events-none opacity-50"
+                        )}
                       >
                         {wish.isLiked ? <FillHeartSvg /> : <HeartSvg />}
                       </div>
@@ -225,11 +217,13 @@ const WishesCards = () => {
                     <div className="flex items-center">
                       <span>
                         {formatTimestamp(
-                          new Date(wish.createdAt.seconds * 1000)
+                          wish.createdAt?.seconds
+                            ? new Date(wish.createdAt.seconds * 1000)
+                            : new Date()
                         )}
                       </span>
                       <div className="flex-1 mx-3 border-t border-dashed border-primary-main"></div>
-                      <span>{wish.user.country}</span>
+                      <span>{wish.user?.country}</span>
                     </div>
                   </div>
                 </div>
@@ -269,24 +263,3 @@ const WishesCards = () => {
 };
 
 export default WishesCards;
-
-type Timestamp = {
-  seconds: number;
-  nanoseconds: number;
-};
-
-type User = {
-  firstName: string;
-  lastName: string;
-  country: string;
-};
-
-type Wish = {
-  id: string;
-  text: string;
-  createdAt: Timestamp;
-  isLiked: boolean;
-  likeCount: number;
-  userId: string;
-  user: User;
-};

@@ -1,5 +1,13 @@
+import AdminLayout from "../../../layout/AdminLayout";
+
 const DashboardPage = () => {
-  return <div>DashboardPage</div>;
+  return (
+    <>
+      <AdminLayout>
+        <p>hello</p>
+      </AdminLayout>
+    </>
+  );
 };
 
 export default DashboardPage;

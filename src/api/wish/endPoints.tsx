@@ -15,18 +15,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 import type { Wish } from "../../types/wishesh";
-import type { User } from "../../types/userType";
-
-export interface WishWithMeta extends Wish {
-  id: string;
-  // userRef: DocumentReference;
-  // user?: User | null;
-  likeCount: number;
-  isLiked: boolean;
-}
 
 export const wishService = {
-  async addWish(wish: { text: string; userId: string }): Promise<string> {
+  async addWish(wish: { text: string; userId: string }): Promise<Wish> {
     try {
       if (!wish.userId || !wish.text) {
         throw new Error("userId and text are required");
@@ -38,13 +29,36 @@ export const wishService = {
         userId: doc(db, "users", wish.userId),
       };
 
+      // Add wish to Firestore
       const docRef = await addDoc(collection(db, "wishes"), wishData);
-      return docRef.id;
+
+      // Get back full wish with user
+      const newWishSnap = await getDoc(docRef);
+      const newWishData = newWishSnap.data() as Wish & { userId: string };
+
+      // Resolve user reference
+      const userRef = doc(db, "users", wish.userId);
+      const userSnap = await getDoc(userRef);
+
+      const data = userSnap.data();
+      const userData = {
+        id: userSnap.id,
+        firstName: data?.firstName,
+        lastName: data?.lastName,
+        country: data?.country,
+      };
+
+      return {
+        ...newWishData,
+        id: docRef.id,
+        userId: wish.userId,
+        user: userData,
+        likeCount: 0,
+        isLiked: false,
+      };
     } catch (error) {
       console.error("Error adding wish:", error);
-      throw error instanceof Error
-        ? error
-        : new Error("Failed to add wish to database");
+      throw new Error("Failed to add wish to database");
     }
   },
 
@@ -54,7 +68,7 @@ export const wishService = {
     pageLimit: number = 10,
     currentUserId?: string,
     lastWishDoc?: DocumentSnapshot | null
-  ): Promise<{ wishes: WishWithMeta[]; lastDoc: DocumentSnapshot | null }> {
+  ): Promise<{ wishes: Wish[]; lastDoc: DocumentSnapshot | null }> {
     try {
       let wishesQuery = query(
         collection(db, "wishes"),
@@ -109,7 +123,7 @@ export const wishService = {
       });
 
       // Fetch users on demand
-      const wishesWithUsers: WishWithMeta[] = await Promise.all(
+      const wishesWithUsers: Wish[] = await Promise.all(
         wishesSnapshot.docs.map(async (docSnap) => {
           const wish = docSnap.data() as Wish;
           const userId =
@@ -123,13 +137,15 @@ export const wishService = {
           const userSnap = await getDoc(userRef);
 
           let userData: {
+            id: string;
             firstName: string;
             lastName: string;
             country: string;
           } | null = null;
           if (userSnap.exists()) {
-            const data = userSnap.data() as User;
+            const data = userSnap.data();
             userData = {
+              id: data.id,
               firstName: data.firstName,
               lastName: data.lastName,
               country: data.country,
@@ -233,7 +249,7 @@ export const wishService = {
   //   }
   // },
 
-  async getTopTwoWishesByLikes(currentUserId: string): Promise<WishWithMeta[]> {
+  async getTopTwoWishesByLikes(currentUserId: string): Promise<Wish[]> {
     try {
       // 1. Collect likes
       const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
@@ -309,20 +325,18 @@ export const wishService = {
             user: userData, // 🔹 minimal user info
             likeCount,
             isLiked,
-          } as WishWithMeta;
+          };
         })
       );
 
-      return result.filter((wish): wish is WishWithMeta => wish !== null);
+      return result.filter((wish): wish is Wish => wish !== null);
     } catch (error) {
       console.error("Error fetching top two wishes by likes:", error);
       throw new Error("Failed to fetch top two wishes by likes");
     }
   },
 
-  async getTopFiveWishesByLikes(
-    currentUserId: string
-  ): Promise<WishWithMeta[]> {
+  async getTopFiveWishesByLikes(currentUserId: string): Promise<Wish[]> {
     try {
       // 1. Collect likes
       const wishLikesSnapshot = await getDocs(collection(db, "wishLikes"));
@@ -398,11 +412,11 @@ export const wishService = {
             user: userData,
             likeCount,
             isLiked,
-          } as WishWithMeta;
+          };
         })
       );
 
-      return result.filter((wish): wish is WishWithMeta => wish !== null);
+      return result.filter((wish): wish is Wish => wish !== null);
     } catch (error) {
       console.error("Error fetching top two wishes by likes:", error);
       throw new Error("Failed to fetch top two wishes by likes");
@@ -414,7 +428,7 @@ export const wishService = {
     currentUserId?: string,
     lastWishDoc?: DocumentSnapshot | null,
     callback?: (result: {
-      wishes: WishWithMeta[];
+      wishes: Wish[];
       lastDoc: DocumentSnapshot | null;
     }) => void
   ) {
@@ -470,7 +484,7 @@ export const wishService = {
         });
 
         // Enrich wishes with user data + likes
-        const wishesWithUsers: WishWithMeta[] = await Promise.all(
+        const wishesWithUsers: Wish[] = await Promise.all(
           wishesSnapshot.docs.map(async (docSnap) => {
             const wish = docSnap.data() as Wish;
             const userId =
@@ -481,6 +495,7 @@ export const wishService = {
                 : wish.userId;
 
             let userData: {
+              id: string;
               firstName: string;
               lastName: string;
               country: string;
@@ -490,8 +505,9 @@ export const wishService = {
               const userRef = doc(db, "users", userId);
               const userSnap = await getDoc(userRef);
               if (userSnap.exists()) {
-                const data = userSnap.data() as User;
+                const data = userSnap.data();
                 userData = {
+                  id: data.id,
                   firstName: data.firstName,
                   lastName: data.lastName,
                   country: data.country,

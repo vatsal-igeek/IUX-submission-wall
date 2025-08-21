@@ -3,11 +3,6 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { routesObject } from "./routesConfig";
 import { getCookie } from "../utils";
 
-interface AdminCookie {
-  value: boolean;
-  expiry: number;
-}
-
 const AdminProtectedRoute: React.FC = () => {
   const location = useLocation();
 

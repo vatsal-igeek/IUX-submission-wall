@@ -1,9 +1,29 @@
 export const BgTopLeftSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="220" height="283" viewBox="0 0 220 283" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="70" cy="132.132" r="150" transform="rotate(-45 70 132.132)" fill="url(#paint0_linear_3_408)" fillOpacity="0.2" />
+    <svg
+      width="220"
+      height="283"
+      viewBox="0 0 220 283"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="70"
+        cy="132.132"
+        r="150"
+        transform="rotate(-45 70 132.132)"
+        fill="url(#paint0_linear_3_408)"
+        fillOpacity="0.2"
+      />
       <defs>
-        <linearGradient id="paint0_linear_3_408" x1="70" y1="-17.868" x2="70" y2="282.132" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear_3_408"
+          x1="70"
+          y1="-17.868"
+          x2="70"
+          y2="282.132"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor={color} />
           <stop offset="1" />
         </linearGradient>
@@ -14,10 +34,30 @@ export const BgTopLeftSvg = ({ color = "var(--color-primary-main)" }) => {
 
 export const BgTopLeftMobileSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="116" height="139" viewBox="0 0 116 139" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="26.6081" cy="50.3483" r="88.6346" transform="rotate(-45 26.6081 50.3483)" fill="url(#paint0_linear_151_3778)" fillOpacity="0.2" />
+    <svg
+      width="116"
+      height="139"
+      viewBox="0 0 116 139"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        cx="26.6081"
+        cy="50.3483"
+        r="88.6346"
+        transform="rotate(-45 26.6081 50.3483)"
+        fill="url(#paint0_linear_151_3778)"
+        fillOpacity="0.2"
+      />
       <defs>
-        <linearGradient id="paint0_linear_151_3778" x1="26.6081" y1="-38.2863" x2="26.6081" y2="138.983" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear_151_3778"
+          x1="26.6081"
+          y1="-38.2863"
+          x2="26.6081"
+          y2="138.983"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor={color} />
           <stop offset="1" />
         </linearGradient>
@@ -26,12 +66,34 @@ export const BgTopLeftMobileSvg = ({ color = "var(--color-primary-main)" }) => {
   );
 };
 
-export const BgRightCenterSvg = ({ color = "var(--color-primary-secondary)" }) => {
+export const BgRightCenterSvg = ({
+  color = "var(--color-primary-secondary)",
+}) => {
   return (
-    <svg width="223" height="354" viewBox="0 0 223 354" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="177" width="250" height="250" transform="rotate(45 177 0)" fill="url(#paint0_linear_3_406)" fillOpacity="0.2" />
+    <svg
+      width="223"
+      height="354"
+      viewBox="0 0 223 354"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="177"
+        width="250"
+        height="250"
+        transform="rotate(45 177 0)"
+        fill="url(#paint0_linear_3_406)"
+        fillOpacity="0.2"
+      />
       <defs>
-        <linearGradient id="paint0_linear_3_406" x1="302" y1="0" x2="302" y2="250" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear_3_406"
+          x1="302"
+          y1="0"
+          x2="302"
+          y2="250"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor={color} />
           <stop offset="1" />
         </linearGradient>
@@ -40,12 +102,34 @@ export const BgRightCenterSvg = ({ color = "var(--color-primary-secondary)" }) =
   );
 };
 
-export const BgRightCenterMobileSvg = ({ color = "var(--color-primary-secondary)" }) => {
+export const BgRightCenterMobileSvg = ({
+  color = "var(--color-primary-secondary)",
+}) => {
   return (
-    <svg width="147" height="226" viewBox="0 0 147 226" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="112.968" width="159.761" height="159.761" transform="rotate(45 112.968 0)" fill="url(#paint0_linear_151_3779)" fillOpacity="0.2" />
+    <svg
+      width="147"
+      height="226"
+      viewBox="0 0 147 226"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="112.968"
+        width="159.761"
+        height="159.761"
+        transform="rotate(45 112.968 0)"
+        fill="url(#paint0_linear_151_3779)"
+        fillOpacity="0.2"
+      />
       <defs>
-        <linearGradient id="paint0_linear_151_3779" x1="192.848" y1="0" x2="192.848" y2="159.761" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="paint0_linear_151_3779"
+          x1="192.848"
+          y1="0"
+          x2="192.848"
+          y2="159.761"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor={color} />
           <stop offset="1" />
         </linearGradient>
@@ -56,32 +140,78 @@ export const BgRightCenterMobileSvg = ({ color = "var(--color-primary-secondary)
 
 export const BgBottomCenterSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="100%" height="100%" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 1440 900"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g filter="url(#filter0_f_3_404)">
         <circle cx="720" cy="900" r="300" fill={color} fillOpacity="0.4" />
       </g>
       <defs>
-        <filter id="filter0_f_3_404" x="-180" y="0" width="1800" height="1800" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <filter
+          id="filter0_f_3_404"
+          x="-180"
+          y="0"
+          width="1800"
+          height="1800"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="300" result="effect1_foregroundBlur_3_404" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          />
+          <feGaussianBlur
+            stdDeviation="300"
+            result="effect1_foregroundBlur_3_404"
+          />
         </filter>
       </defs>
     </svg>
   );
 };
 
-export const BgBottomCenterMobileSvg = ({ color = "var(--color-primary-main)" }) => {
+export const BgBottomCenterMobileSvg = ({
+  color = "var(--color-primary-main)",
+}) => {
   return (
-    <svg width="100%" height="100%" viewBox="0 0 390 610" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="100%"
+      height="100%"
+      viewBox="0 0 390 610"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g filter="url(#filter0_f_151_3757)">
         <circle cx="195" cy="530" r="180" fill={color} fillOpacity="0.4" />
       </g>
       <defs>
-        <filter id="filter0_f_151_3757" x="-335" y="0" width="1060" height="1060" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+        <filter
+          id="filter0_f_151_3757"
+          x="-335"
+          y="0"
+          width="1060"
+          height="1060"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
           <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation="175" result="effect1_foregroundBlur_151_3757" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          />
+          <feGaussianBlur
+            stdDeviation="175"
+            result="effect1_foregroundBlur_151_3757"
+          />
         </filter>
       </defs>
     </svg>
@@ -90,7 +220,13 @@ export const BgBottomCenterMobileSvg = ({ color = "var(--color-primary-main)" })
 
 export const HomeDividerSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="31"
+      height="31"
+      viewBox="0 0 31 31"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M15.5 12.15C16.9875 12.15 18.2 10.9375 18.2 9.45C18.2 7.9625 16.9875 6.75 15.5 6.75C14.0125 6.75 12.8 7.9625 12.8 9.45C12.8 10.9375 14.0125 12.15 15.5 12.15Z"
         fill={color}
@@ -121,7 +257,13 @@ export const HomeDividerSvg = ({ color = "var(--color-primary-main)" }) => {
 
 export const CalendarSvg = () => {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M6 4.3125C5.6925 4.3125 5.4375 4.0575 5.4375 3.75V1.5C5.4375 1.1925 5.6925 0.9375 6 0.9375C6.3075 0.9375 6.5625 1.1925 6.5625 1.5V3.75C6.5625 4.0575 6.3075 4.3125 6 4.3125Z"
         fill="white"
@@ -168,7 +310,13 @@ export const CalendarSvg = () => {
 
 export const FillHeartSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 30 30"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M20.55 3.875C18.2875 3.875 16.2625 4.975 15 6.6625C13.7375 4.975 11.7125 3.875 9.45 3.875C5.6125 3.875 2.5 7 2.5 10.8625C2.5 12.35 2.7375 13.725 3.15 15C5.125 21.25 11.2125 24.9875 14.225 26.0125C14.65 26.1625 15.35 26.1625 15.775 26.0125C18.7875 24.9875 24.875 21.25 26.85 15C27.2625 13.725 27.5 12.35 27.5 10.8625C27.5 7 24.3875 3.875 20.55 3.875Z"
         fill={color}
@@ -179,9 +327,85 @@ export const FillHeartSvg = ({ color = "var(--color-primary-main)" }) => {
 
 export const HeartSvg = ({ color = "var(--color-primary-main)" }) => {
   return (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 30 30"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
         d="M15 27.0625C14.6125 27.0625 14.2375 27.0125 13.925 26.9C9.15 25.2625 1.5625 19.45 1.5625 10.8625C1.5625 6.4875 5.1 2.9375 9.45 2.9375C11.5625 2.9375 13.5375 3.7625 15 5.2375C16.4625 3.7625 18.4375 2.9375 20.55 2.9375C24.9 2.9375 28.4375 6.5 28.4375 10.8625C28.4375 19.4625 20.85 25.2625 16.075 26.9C15.7625 27.0125 15.3875 27.0625 15 27.0625ZM9.45 4.8125C6.1375 4.8125 3.4375 7.525 3.4375 10.8625C3.4375 19.4 11.65 24.15 14.5375 25.1375C14.7625 25.2125 15.25 25.2125 15.475 25.1375C18.35 24.15 26.575 19.4125 26.575 10.8625C26.575 7.525 23.875 4.8125 20.5625 4.8125C18.6625 4.8125 16.9 5.7 15.7625 7.2375C15.4125 7.7125 14.6125 7.7125 14.2625 7.2375C13.1 5.6875 11.35 4.8125 9.45 4.8125Z"
+        fill={color}
+      />
+    </svg>
+  );
+};
+
+export const LayoutDashboard = ({ color = "white" }) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M7 10.75H5C2.58 10.75 1.25 9.42 1.25 7V5C1.25 2.58 2.58 1.25 5 1.25H7C9.42 1.25 10.75 2.58 10.75 5V7C10.75 9.42 9.42 10.75 7 10.75ZM5 2.75C3.42 2.75 2.75 3.42 2.75 5V7C2.75 8.58 3.42 9.25 5 9.25H7C8.58 9.25 9.25 8.58 9.25 7V5C9.25 3.42 8.58 2.75 7 2.75H5Z"
+        fill={color}
+      />
+      <path
+        d="M19 10.75H17C14.58 10.75 13.25 9.42 13.25 7V5C13.25 2.58 14.58 1.25 17 1.25H19C21.42 1.25 22.75 2.58 22.75 5V7C22.75 9.42 21.42 10.75 19 10.75ZM17 2.75C15.42 2.75 14.75 3.42 14.75 5V7C14.75 8.58 15.42 9.25 17 9.25H19C20.58 9.25 21.25 8.58 21.25 7V5C21.25 3.42 20.58 2.75 19 2.75H17Z"
+        fill={color}
+      />
+      <path
+        d="M19 22.75H17C14.58 22.75 13.25 21.42 13.25 19V17C13.25 14.58 14.58 13.25 17 13.25H19C21.42 13.25 22.75 14.58 22.75 17V19C22.75 21.42 21.42 22.75 19 22.75ZM17 14.75C15.42 14.75 14.75 15.42 14.75 17V19C14.75 20.58 15.42 21.25 17 21.25H19C20.58 21.25 21.25 20.58 21.25 19V17C21.25 15.42 20.58 14.75 19 14.75H17Z"
+        fill={color}
+      />
+      <path
+        d="M7 22.75H5C2.58 22.75 1.25 21.42 1.25 19V17C1.25 14.58 2.58 13.25 5 13.25H7C9.42 13.25 10.75 14.58 10.75 17V19C10.75 21.42 9.42 22.75 7 22.75ZM5 14.75C3.42 14.75 2.75 15.42 2.75 17V19C2.75 20.58 3.42 21.25 5 21.25H7C8.58 21.25 9.25 20.58 9.25 19V17C9.25 15.42 8.58 14.75 7 14.75H5Z"
+        fill={color}
+      />
+    </svg>
+  );
+};
+
+export const WishStar = ({ color = "white" }) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M13.0103 22.5C12.4103 22.5 11.4803 22.21 10.5903 20.75L8.83027 17.9C8.66027 17.62 8.14026 17.35 7.82026 17.37L4.48024 17.54C2.48024 17.64 1.78028 16.81 1.53028 16.31C1.28028 15.81 1.06024 14.74 2.36024 13.22L4.34028 10.92C4.54028 10.68 4.65025 10.16 4.56025 9.86002L3.55024 6.63004C3.04024 5.01004 3.61025 4.14004 3.99025 3.76004C4.37024 3.38004 5.25025 2.83003 6.87025 3.37003L9.82026 4.34003C10.0903 4.43003 10.5903 4.35003 10.8203 4.19003L13.9003 1.97003C15.3103 0.950032 16.3302 1.22003 16.8002 1.47003C17.2702 1.72003 18.0702 2.40005 18.0402 4.14005L17.9702 7.93002C17.9602 8.21002 18.1902 8.67003 18.4102 8.84003L20.8903 10.72C22.2403 11.75 22.2903 12.78 22.2003 13.31C22.1103 13.84 21.7103 14.8 20.0903 15.3L16.8602 16.31C16.5602 16.4 16.1902 16.79 16.1102 17.09L15.3403 20.03C14.8303 21.96 13.8303 22.39 13.2703 22.47C13.2003 22.49 13.1103 22.5 13.0103 22.5ZM7.85023 15.87C8.71023 15.87 9.66023 16.39 10.1002 17.11L11.8602 19.96C12.3602 20.78 12.8102 21.03 13.0502 20.99C13.2802 20.96 13.6403 20.58 13.8903 19.66L14.6602 16.72C14.8702 15.92 15.6202 15.13 16.4102 14.89L19.6403 13.88C20.2603 13.69 20.6602 13.38 20.7202 13.06C20.7802 12.74 20.5002 12.32 19.9802 11.92L17.5003 10.04C16.8903 9.58004 16.4503 8.66002 16.4603 7.90002L16.5303 4.11002C16.5403 3.44002 16.3803 2.94004 16.0903 2.79004C15.8003 2.64004 15.3103 2.79002 14.7603 3.18002L11.6802 5.40002C11.0702 5.84002 10.0603 6.00004 9.33027 5.76004L6.38026 4.79004C5.76026 4.59004 5.26028 4.60002 5.03028 4.83002C4.80028 5.06002 4.78023 5.56002 4.97023 6.18002L5.98024 9.41003C6.23024 10.2 6.01023 11.27 5.47023 11.89L3.49025 14.19C2.86025 14.92 2.76025 15.43 2.87025 15.64C2.97025 15.85 3.45028 16.08 4.40028 16.03L7.74025 15.86C7.78025 15.87 7.82023 15.87 7.85023 15.87Z"
+        fill={color}
+      />
+      <path
+        d="M21.9098 22.7502C21.7198 22.7502 21.5299 22.6802 21.3799 22.5302L18.3498 19.5002C18.0598 19.2102 18.0598 18.7302 18.3498 18.4402C18.6398 18.1502 19.1198 18.1502 19.4098 18.4402L22.4399 21.4702C22.7299 21.7602 22.7299 22.2402 22.4399 22.5302C22.2899 22.6802 22.0998 22.7502 21.9098 22.7502Z"
+        fill={color}
+      />
+    </svg>
+  );
+};
+export const Circle = ({ color = "white" }) => {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M12 22.75C6.07 22.75 1.25 17.93 1.25 12C1.25 6.07 6.07 1.25 12 1.25C17.93 1.25 22.75 6.07 22.75 12C22.75 17.93 17.93 22.75 12 22.75ZM12 2.75C6.9 2.75 2.75 6.9 2.75 12C2.75 17.1 6.9 21.25 12 21.25C17.1 21.25 21.25 17.1 21.25 12C21.25 6.9 17.1 2.75 12 2.75Z"
+        fill={color}
+      />
+      <path
+        d="M12 14.75C10.48 14.75 9.25 13.52 9.25 12C9.25 10.48 10.48 9.25 12 9.25C13.52 9.25 14.75 10.48 14.75 12C14.75 13.52 13.52 14.75 12 14.75ZM12 10.75C11.31 10.75 10.75 11.31 10.75 12C10.75 12.69 11.31 13.25 12 13.25C12.69 13.25 13.25 12.69 13.25 12C13.25 11.31 12.69 10.75 12 10.75Z"
         fill={color}
       />
     </svg>
