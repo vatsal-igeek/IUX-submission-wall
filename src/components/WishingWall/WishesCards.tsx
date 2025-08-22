@@ -117,6 +117,23 @@ const WishesCards = () => {
     };
   }, [hasMore, loadingMore, loadMoreWishes]);
 
+  function formatTimestampToGMT(timestamp: { seconds: number; nanoseconds: number }) {
+  const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
+
+  let time = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "GMT",
+  });
+
+  // Force AM/PM to uppercase
+  time = time.replace("am", "AM").replace("pm", "PM");
+
+  return time + " GMT";
+}
+  
+
   // For card entry animations
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -216,14 +233,15 @@ const WishesCards = () => {
                   <div className="mt-[1.875rem] text-primary-main text-sm md:text-base font-medium">
                     <div className="flex items-center">
                       <span>
-                        {formatTimestamp(
+                        {/* {formatTimestamp(
                           wish.createdAt?.seconds
                             ? new Date(wish.createdAt.seconds * 1000)
                             : new Date()
-                        )}
+                        )} */}
+                        {formatTimestampToGMT(wish.createdAt)}
                       </span>
                       <div className="flex-1 mx-3 border-t border-dashed border-primary-main"></div>
-                      <span>{wish.user?.country}</span>
+                      <span className="uppercase">{wish.user?.country}</span>
                     </div>
                   </div>
                 </div>

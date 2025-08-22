@@ -1,6 +1,6 @@
 const PolicySection = () => {
   return (
-    <div className="max-w-[75rem] mx-auto pt-24 relative z-10">
+    <div className="max-w-[75rem] mx-auto pt-[200px] relative z-10">
       {/* Main Heading */}
       <h1 className="font-size-4rem font-extrabold text-white mb-4">
         Privacy Policy

@@ -94,9 +94,9 @@ const GuidelineItem = ({
 
   return (
     <li
-      className={cn("flex", type === "bullet" ? "items-center" : "items-start")}
+      className={cn("flex", type === "bullet" ? "items-start" : "items-start")}
     >
-      <span className="text-primary-main mr-3 mt-1 font-bold font-size-1_5rem">
+      <span className="text-primary-main mr-3 mt-0 font-bold font-size-1_5rem">
         {type === "bullet" ? bulletIcon : number}
       </span>
       <p className="text-subTitle font-size-1_5rem">

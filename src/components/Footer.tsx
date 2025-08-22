@@ -17,7 +17,7 @@ const Footer = ({ isTransParent = true }: FooterProps) => {
       <div className="my-dashed-border w-full">
         <div
           className={
-            "w-full max-w-[80rem] py-5 mx-auto px-4 xs:px-6 flex flex-col xs:flex-row justify-between items-center text-subTitle text-base font-primary gap-4"
+            "w-full max-w-[80rem] py-5 mx-auto px-4 xs:px-6 flex flex-col xs:flex-row justify-between items-center text-subTitle font-medium text-base font-primary gap-4"
           }
         >
           <span>© 2025 All rights reserved</span>

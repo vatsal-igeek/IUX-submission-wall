@@ -31,7 +31,7 @@ const ContentGuidelinePage = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-[75rem] mx-auto pt-24 relative z-10">
+        <div className="max-w-[75rem] mx-auto pt-[200px] relative z-10">
           {/* Main Heading */}
           <h1 className="font-size-4rem font-extrabold text-white ">
             Wishing Wall Content Guidelines:
@@ -49,7 +49,7 @@ const ContentGuidelinePage = () => {
 
           {/* Introduction */}
           <div className="mb-8">
-            <p className="text-subTitle font-size-1_5rem mb-4">
+            <p className="text-subTitle font-size-1_5rem mb-4 font-medium">
               Welcome to The Network of Wisdom. This is a space for collective
               learning and shared financial insights. To maintain a positive and
               constructive environment, please adhere to the following

@@ -77,7 +77,7 @@ export const languageRequirement = [
   {
     description:
       "All submissions must be in English only. Messages in other languages will be removed.",
-    highlightedText: "English only.",
+    highlightedText: "English",
   },
 ];
 
