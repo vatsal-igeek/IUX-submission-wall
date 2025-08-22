@@ -19,6 +19,11 @@ export const authService = {
         throw new Error("All required fields must be provided");
       }
 
+      const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+      if (!emailRegex.test(userData.email)) {
+        throw new Error("Invalid email format");
+      }
+
       // Always save dob as 'YYYY-MM-DD' string
       let dobStr: string;
       if (userData.dob instanceof Date) {
