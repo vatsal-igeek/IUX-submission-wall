@@ -19,12 +19,13 @@ import type { Wish } from "../../types/wishesh";
 export const wishService = {
   async addWish(wish: { text: string; userId: string }): Promise<Wish> {
     try {
-      if (!wish.userId || !wish.text) {
+      const trimmedText = wish.text.trim();
+      if (!wish.userId || !trimmedText) {
         throw new Error("userId and text are required");
       }
 
       const wishData = {
-        text: wish.text,
+        text: trimmedText,
         createdAt: serverTimestamp(),
         userId: doc(db, "users", wish.userId),
       };

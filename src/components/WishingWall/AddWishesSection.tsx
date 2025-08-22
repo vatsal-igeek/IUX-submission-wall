@@ -18,11 +18,12 @@ const AddWishesSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!userId || !message) return;
+      const trimmedMessage = message.trim();
+      if (!userId || !trimmedMessage) return;
 
       setIsSubmitting(true);
       await wishService.addWish({
-        text: message,
+        text: trimmedMessage,
         userId: userId,
       });
       setMessage("");

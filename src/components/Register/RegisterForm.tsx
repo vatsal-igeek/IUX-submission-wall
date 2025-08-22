@@ -23,6 +23,7 @@ import { routesObject } from "../../routes/routesConfig";
 import DatePicker from "react-datepicker";
 import { CalendarSvg } from "../../icons";
 import MagicBento from "../animations/MagicBento/MagicBento";
+import { Search } from "lucide-react";
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
@@ -283,7 +284,7 @@ export const RegisterForm = () => {
                           key={gender}
                           onClick={() => {
                             genderDropdown.selectOption(gender);
-                            genderDropdown.toggleDropdown();
+                            genderDropdown.closeDropdown();
                           }}
                           className="w-full py-3 px-4 text-left hover:cursor-pointer hover:bg-gray-700 transition-colors"
                         >
@@ -372,21 +373,26 @@ export const RegisterForm = () => {
               </button>
               {countryDropdown.isOpen && (
                 <div
-                  className={`absolute flex flex-col left-0 right-0 bg-inputBg rounded-lg shadow-lg z-50 ${
+                  className={`absolute flex flex-col left-0 right-0 bg-inputBg rounded-lg shadow-lg z-50 overflow-hidden ${
                     countryDropdown.direction === "up"
                       ? "bottom-full mb-2"
                       : "top-full mt-1"
                   }`}
                   style={{ maxHeight: 300 }}
                 >
-                  <input
-                    type="text"
-                    value={countryDropdown.search}
-                    onChange={(e) => countryDropdown.setSearch(e.target.value)}
-                    placeholder="Search country..."
-                    className="p-3 bg-transparent text-white border-b border-gray-600 outline-none"
-                    autoComplete="off"
-                  />
+                  <div className="relative border-b border-gray-600">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={countryDropdown.search}
+                      onChange={(e) =>
+                        countryDropdown.setSearch(e.target.value)
+                      }
+                      placeholder="Search country..."
+                      className="p-3 bg-transparent text-white  outline-none pl-12"
+                      autoComplete="off"
+                    />
+                  </div>
                   <ul className="max-h-60 overflow-y-auto mb-2">
                     {countryDropdown.filteredOptions.map((name) => (
                       <li
