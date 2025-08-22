@@ -270,11 +270,11 @@ const WishesCards = () => {
         )}
 
         {/* No More Data Message */}
-        {!hasMore && wishes.length > 0 && (
+        {/* {!hasMore && wishes.length > 0 && (
           <div className="text-center mt-10 text-gray-500">
             No more wishes to load
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
