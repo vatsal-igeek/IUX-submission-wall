@@ -5,7 +5,6 @@ import { wishService } from "../../api/wish/endPoints";
 import SkeletonCard from "./SkeletonCard";
 import { cn } from "../../utils/cn";
 import { getCookie } from "../../utils";
-import formatTimestamp from "../../utils/formatTimestamp";
 import { useOptimisticWishes } from "../../hooks/useOptimisticWishes";
 import type { Wish } from "../../types/wishesh";
 
@@ -117,22 +116,26 @@ const WishesCards = () => {
     };
   }, [hasMore, loadingMore, loadMoreWishes]);
 
-  function formatTimestampToGMT(timestamp: { seconds: number; nanoseconds: number }) {
-  const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
+  function formatTimestampToGMT(timestamp: {
+    seconds: number;
+    nanoseconds: number;
+  }) {
+    const date = new Date(
+      timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6
+    );
 
-  let time = date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "GMT",
-  });
+    let time = date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "GMT",
+    });
 
-  // Force AM/PM to uppercase
-  time = time.replace("am", "AM").replace("pm", "PM");
+    // Force AM/PM to uppercase
+    time = time.replace("am", "AM").replace("pm", "PM");
 
-  return time + " GMT";
-}
-  
+    return time + " GMT";
+  }
 
   // For card entry animations
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());

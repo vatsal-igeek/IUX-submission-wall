@@ -386,7 +386,9 @@ export const RegisterForm = () => {
                       type="text"
                       value={countryDropdown.search}
                       onChange={(e) =>
-                        countryDropdown.setSearch(e.target.value)
+                        countryDropdown.setSearch(
+                          e.target.value.replace(/^\s+/, "")
+                        )
                       }
                       placeholder="Search country..."
                       className="p-3 bg-transparent text-white  outline-none pl-12"

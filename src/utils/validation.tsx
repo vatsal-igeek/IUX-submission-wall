@@ -6,13 +6,13 @@ export const registerSchema = yup.object({
     .required("First name is required")
     .min(2, "First name must be at least 2 characters")
     .max(50, "First name must be less than 50 characters")
-    .matches(/^[a-zA-Z\s]*$/, "First name can only contain letters and spaces"),
+    .matches(/^[a-zA-Z]+$/, "First name can only contain letters"),
   lastName: yup
     .string()
     .required("Last name is required")
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters")
-    .matches(/^[a-zA-Z\s]*$/, "Last name can only contain letters and spaces"),
+    .matches(/^[a-zA-Z]+$/, "Last name can only contain letters"),
   email: yup
     .string()
     .required("Email is required")

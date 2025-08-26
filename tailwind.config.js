@@ -24,6 +24,7 @@ export default {
           primary: "#EBF9F4",
         },
         skeleton: "#B0B0B0",
+        danger: "#FF9A9C",
       },
       fontFamily: {
         primary: ["Manrope", "sans-serif"],
